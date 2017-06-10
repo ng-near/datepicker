@@ -6,7 +6,7 @@ So now our main goal is to provide a toolset so you can easily build yourself yo
 You can either write away a datepicker direcly on your template or create a reusable component
 Here is the code for a simple datepicker :
 
-```
+```html
 <div *forMonth="let month of months; first as first; last as last; selector as selector; navigator as nav" singleSelect>
   <div class="header">
     <button (click)="months = nav.moveMonth(-1, month)">prev</button>
@@ -25,7 +25,7 @@ Here is the code for a simple datepicker :
   </div>
 </div>
 ```
-```
+```ts
 export class MyDatepicker {
   months: Date[] = [newMonthDate()];
 }
@@ -49,7 +49,7 @@ API shouldn't be considered stable until we reach version 1.0.0.
 ## Usage
 
 You just need to import `DatepickerModule` and you can start working with the directives.
-```
+```ts
 import { DatepickerModule } from 'ng-imbadatepicker';
 
 @NgModule({
@@ -95,7 +95,7 @@ Re-selecting a selected date will unselected it.
 
 #### MultiSelect
 **class**: `MultiSelect`  
-**selector**: '[multiSelect]'  
+**selector**: `[multiSelect]`  
 **input**: `multiSelect` Define the limit number of dates to select.  
 **usage example**: `<div multiSelect="2">`  
 
@@ -121,10 +121,10 @@ They works closely to how form validators works, still the usage is a bit differ
 **input**: `dateConstraint` take one or an array of `DateConstraintFn`. You must use an **immutable array** so we can detect changes properly.  
 **output**: `constraintChange` Fires when input changes (was meant as an internal thing only but why not make it an @Ouput too).  
 **usage example**:
-```
+```html
 <div singleSelect dateConstraint="constraints">
 ```
-```
+```ts
 export class MyDatepicker {
   /* we need to define a property with the constraints to pass them to the directive.
    * this could be seen as a flaw of the single directive implementation but most constraints
@@ -202,10 +202,10 @@ This directive will inject a template for each day of the week with names accord
 **input**: `selectClass` A date defining a day.  
 **input**: `classesName` An object to match a className to a state. The object doesn't need to provide a class name for all state, missing state will use default class name.  
 **usage example**:
-```
+```html
 <span [stateClass]="day" [classesNames]="classesNames">
 ```
-```
+```ts
 export class MyDatepicker {
   classesNames = {
     invalid: 'disabled',
