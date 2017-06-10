@@ -1,0 +1,87 @@
+html {
+  font-size: 12px;
+}
+
+simple-datepicker,
+select-datepicker {
+  display: inline-block;
+  background: #8CBED6;
+
+  .month {
+    margin: 1px;
+  }
+
+  .header {
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+  }
+
+  .weekNames {
+    background: #4748ec;
+    color: white;
+  }
+
+  .days {
+    background: white;
+
+    span {
+      padding: 1px;
+      box-sizing: border-box;
+      line-height: calc(2em - 2px) !important; //shame
+
+      background-clip: content-box;
+
+      cursor: pointer;
+
+      &:hover {
+        border-radius: 50%;
+        background-color: #a4b1ff;
+      }
+
+      &:not(.currMonth) {
+        opacity: .3;
+        pointer-events: none;
+      }
+
+      &.isToday {
+        border-radius: 10%;
+        background-color: #ddd;
+      }
+
+      &.invalid {
+        background-color: #999;
+        background-clip: padding-box;
+        opacity: .5;
+        cursor: not-allowed;
+      }
+
+      &.inSelection {
+        border-radius: 50%;
+        background-color: #554ff9;
+        color: white;
+      }
+
+      &.selected {
+        border-radius: 50%;
+        background-color: #110bad;
+        color: white;
+      }
+    }
+  }
+
+  // only for multiple month display
+  .month:not(:first-child),
+  .month:not(:last-child) {
+
+    .days {
+      span:not(.currMonth) {
+        visibility: hidden;
+      }
+    }
+  }
+
+}
+

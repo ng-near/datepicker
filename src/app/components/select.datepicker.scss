@@ -1,0 +1,46 @@
+$daySize: 2em;
+
+.month {
+  display: inline-block;
+  width: 7*$daySize;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  padding: .5em 0;
+
+  span {
+    margin: auto;
+  }
+
+  button {
+    padding: 0;
+  }
+}
+
+.weekNames {
+  span {
+    display: inline-block;
+
+    $fontRatio: 0.8;
+    width: $daySize / $fontRatio;
+
+    font-size: #{$fontRatio}em;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+.days {
+  span {
+    display: inline-block;
+    width: $daySize;
+    height: $daySize;
+    line-height: $daySize;
+    text-align: center;
+
+    box-sizing: border-box;
+  }
+}

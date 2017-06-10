@@ -1,0 +1,25 @@
+h3 {
+  clear: both;
+}
+
+section {
+
+  > span {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+
+    margin: 0 5px;
+
+    input + simple-datepicker {
+      position: absolute;
+      top: 100%;
+      left: 0;
+    }
+  }
+
+}
+
+simple-datepicker {
+  margin: 0 2px;
+}

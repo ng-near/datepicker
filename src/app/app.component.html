@@ -1,0 +1,76 @@
+<h1>Datepicker Examples</h1>
+<section>
+  <h2>Selection</h2>
+  <span>
+    <h3>Single selection</h3>
+    <simple-datepicker singleSelect [(ngModel)]="singleSelectDate"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Multiple selection</h3>
+    <simple-datepicker multiSelect="3" [(ngModel)]="multiSelectDate"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Range selection</h3>
+    <simple-datepicker rangeSelect [(ngModel)]="rangeSelectDate"></simple-datepicker>
+  </span>
+</section>
+<section>
+  <h2>Date validator</h2>
+  <span>
+    <h3>Min date</h3>
+    <simple-datepicker singleSelect [dateConstraint]="minDateConstraint"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Max date</h3>
+    <simple-datepicker singleSelect [dateConstraint]="maxDateConstraint"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Disabled date</h3>
+    <simple-datepicker singleSelect [dateConstraint]="invalidDateConstraint"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Disable weekend</h3>
+    <simple-datepicker singleSelect [dateConstraint]="invalidateWeekendConstraint"></simple-datepicker>
+  </span>
+  <span>
+    <h3>Composed: min, max and weekend</h3>
+    <simple-datepicker singleSelect [dateConstraint]="[minDateConstraint, maxDateConstraint, invalidateWeekendConstraint]"></simple-datepicker>
+  </span>
+</section>
+<section>
+  <h2>Custom</h2>
+  <span>
+    <h3>Two month display</h3>
+    <simple-datepicker singleSelect [months]="months"></simple-datepicker>
+  </span>
+  <span>
+    <h3>With selects</h3>
+    <select-datepicker singleSelect></select-datepicker>
+  </span>
+   <span>
+    <h3>Sync selection calendars</h3>
+    <div singleSelect>
+      <simple-datepicker></simple-datepicker>
+      <simple-datepicker></simple-datepicker>
+    </div>
+  </span>
+</section>
+<section>
+  <h2>Inside form</h2>
+  <span>
+    <h3>As an inline FormControl</h3>
+    <form #form=ngForm>
+      <p>Form value:<br>{{ form.value | json }}</p>
+      <simple-datepicker singleSelect name="date" ngModel></simple-datepicker>
+      <div>
+        <button type="reset">Reset form</button>
+      </div>
+    </form>
+  </span>
+  <span>
+    <h3>With an input</h3>
+    <p>you must respect the format 'MMM DD YYYY' scrupulously.<br>(it's just a demo)</p>
+    <input (focus)="showInputDP = true" (blur)="showInputDP = false" [ngModel]="inputDp | date" (ngModelChange)="inputDp = parseDate($event)">
+    <simple-datepicker singleSelect *ngIf="showInputDP" [(ngModel)]="inputDp"></simple-datepicker>
+  </span>
+</section>
