@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "compilerOptions": {
+    "declaration": true,
+    "experimentalDecorators": true,
+    "strict": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": ["es2015", "dom"],
+    "module": "es2015",
+    "moduleResolution": "node",
+    "rootDir": "src/",
+    "baseUrl": "",
+    "sourceMap": true,
+    "target": "es5",
+    "inlineSources": true,
+    "stripInternal": true,
+    "types": [ ],
+    "outDir": "build/es2015"
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "angularCompilerOptions": {
+    "annotateForClosureCompiler": true,
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": true,
+    "genDir": "dist/",
+
+    "flatModuleOutFile": "quickstart-lib.js",
+    "flatModuleId": "quickstart-lib",
+    "debug": true
+  }
+}
