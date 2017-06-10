@@ -7,7 +7,11 @@ You can either write away a datepicker direcly on your template or create a reus
 Here is the code for a simple datepicker :
 
 ```html
-<div *forMonth="let month of months; first as first; last as last; selector as selector; navigator as nav" singleSelect>
+<div singleSelect *forMonth="let month of months;
+  first as first;
+  last as last;
+  selector as selector;
+  navigator as nav">
   <div class="header">
     <button (click)="months = nav.moveMonth(-1, month)">prev</button>
     <span>{{ month | date: 'MMMM y' }}</span>
@@ -109,7 +113,7 @@ Re-selecting a selected date will unselected it.
 **selector**: `[rangeSelect]`  
 **usage example**: `<div rangeSelect>`  
 
-This directive will select 2 valid date to form a range and return a [`RangeDate`]() object.
+This directive will select 2 valid date to form a range and return a [`RangeDate`](./src/selection/range.select.ts#L7-L10) object.
 Once you have 2 date selected if you select a third date, the closest between the start date and the end date will be replaced.
 Re-selecting a selected date will unselected it.
 
