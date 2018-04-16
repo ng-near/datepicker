@@ -1,12 +1,28 @@
-import { Directive, Input, ElementRef, Renderer2 as Renderer, OnChanges, SimpleChanges, OnDestroy, Optional } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Inject,
+  InjectionToken,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Optional,
+  Renderer2 as Renderer,
+  SimpleChanges
+} from '@angular/core';
+
 import { Subscription } from 'rxjs/Subscription';
 
-import { DatepickerSelect } from '../selection/base.select';
 import { DateConstraint } from '../constraint/dateconstraint.directive';
+import { DatepickerSelect } from '../selection/base.select';
 import { DayDate } from '../utils';
 
-// string enum may help here (ts > 2.4)
-type DayState = 'invalid' | 'valid' | 'inSelection' | 'selected';
+const enum DayState {
+  INVALID = 'invalid',
+  VALID = 'valid',
+  IN_SELECTION = 'inSelection',
+  SELECTED = 'selected',
+};
 
 export interface StateClassesName {
   invalid: string;
@@ -15,15 +31,18 @@ export interface StateClassesName {
   selected: string;
 }
 
+export const STATE_CLASSES = new InjectionToken('');
+
 @Directive({
   selector: '[selectClass]'
 })
 export class SelectClass implements OnChanges, OnDestroy {
 
-  @Input('selectClass') day: DayDate;
+  @Input('selectClass')
+  day: DayDate;
 
-  @Input()
-  private classesName: Partial<StateClassesName> = {};
+  private getClass: (s: DayState) => string = s => s;
+  private getValidityState: () => DayState.VALID | DayState.INVALID = () => DayState.VALID;
 
   private selectState: DayState;
 
@@ -31,44 +50,72 @@ export class SelectClass implements OnChanges, OnDestroy {
 
   constructor (
     private select: DatepickerSelect<any>,
+    @Optional() @Inject(STATE_CLASSES) private stateClasses: Partial<StateClassesName> | null,
     @Optional() private dateConstraint: DateConstraint,
     private elRef: ElementRef,
     private renderer: Renderer) {
 
-    this.subs
-      .add( select.selectionChange.subscribe(() => { this.updateStateClass() }) );
+    this.subs.add(
+      select.selectionChange.subscribe(() => { this.updateSelection() })
+    );
+
+    if (stateClasses !== null) {
+      this.getClass = (s: DayState) => stateClasses[s] || s;
+    }
 
     if (dateConstraint !== null) {
-      this.subs.add( dateConstraint.constraintChange.subscribe( () => { this.updateStateClass() }) )
+      this.getValidityState = () => dateConstraint.isDateValid(this.day) ? DayState.VALID : DayState.INVALID;
+      this.subs.add(
+        dateConstraint.constraintChange.subscribe( () => { this.updateValidity() })
+      );
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if ('day' in changes) {
-      this.updateStateClass();
+    this.updateFull();
+  }
+
+  private getSelectionState() {
+    return this.select.isDateSelected(this.day) ? DayState.SELECTED :
+      this.select.isDateInSelection(this.day) ? DayState.IN_SELECTION :
+      null;
+  }
+
+  private updateSelection() {
+    if (this.selectState !== DayState.INVALID) {
+      const state = this.getValidityState() || DayState.VALID;
+      this.updateStateClass(state);
     }
   }
 
-  updateStateClass() {
-    const newState: DayState =
-      this.select.isDateSelected(this.day) ?    'selected' :
-      this.select.isDateInSelection(this.day) ? 'inSelection' :
-      this.dateConstraint === null || this.dateConstraint.isDateValid(this.day) ? 'valid' :
-                                  'invalid' ;
+   // validity could have change selection but if so selectionChange will fire
+   // so we don't have to handle it
+  private updateValidity() {
+    const state = this.getValidityState();
 
-    if (newState !== this.selectState ) {
-      this.setClass(this.selectState, false);
-      this.setClass(newState, true);
+    /* when new state is invalid we always update
+     * but when new state is valid we only update if it was previously invalid
+     *   if state was valid, select or inselection we keep it that way.
+     */
+    if (state === DayState.INVALID || (this.selectState === DayState.INVALID)) {
+      this.updateStateClass(state);
     }
-
-    this.selectState = newState;
   }
 
-  private setClass(name: DayState, add: boolean) {
-    if (add === true)
-      this.renderer.addClass(this.elRef.nativeElement, this.classesName[ name ] || name);
-    else
-      this.renderer.removeClass(this.elRef.nativeElement, this.classesName[ name ] || name);
+  updateFull() {
+    const newState: DayState = this.getSelectionState() || this.getValidityState();
+
+    this.updateStateClass(newState);
+  }
+
+
+  updateStateClass(state: DayState) {
+    if (state !== this.selectState) {
+      this.renderer.addClass(this.elRef.nativeElement, this.getClass(state));
+      this.renderer.removeClass(this.elRef.nativeElement, this.getClass(this.selectState));
+
+      this.selectState = state;
+    }
   }
 
   ngOnDestroy() {

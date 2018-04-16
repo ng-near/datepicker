@@ -11,7 +11,7 @@ export { DateConstraint } from './constraint/dateconstraint.directive';
 export { DateNavigator, ForMonthOf } from './display/formonth';
 export { ForMonthday } from './display/formonthday';
 
-export { SelectClass } from './display/selectclass';
+export { SelectClass, STATE_CLASSES } from './display/selectclass';
 
 export * from './utils';
 

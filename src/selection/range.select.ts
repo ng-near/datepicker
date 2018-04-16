@@ -1,8 +1,8 @@
-import { Directive, OnChanges, SimpleChanges, Optional } from '@angular/core';
+import { Directive, Optional } from '@angular/core';
 
-import { DatepickerSelect, selectProviders } from './base.select';
-import { DayDate, isSameDay } from '../utils';
 import { DateConstraint } from '../constraint/dateconstraint.directive';
+import { DayDate, isSameDay } from '../utils';
+import { DatepickerSelect, selectProviders } from './base.select';
 
 export interface RangeDate {
   start: DayDate | null;
@@ -13,7 +13,7 @@ export interface RangeDate {
   selector: '[rangeSelect]',
   providers: selectProviders(RangeSelect)
 })
-export class RangeSelect extends DatepickerSelect<RangeDate> implements OnChanges {
+export class RangeSelect extends DatepickerSelect<RangeDate> {
 
   protected get EMPTY_VALUE(): RangeDate {
     return {
@@ -54,7 +54,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate> implements OnChange
     };
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  updateValidity() {
     let start = this.value.start,
        end = this.value.end;
 

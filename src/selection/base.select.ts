@@ -1,11 +1,12 @@
-import { Output, EventEmitter, forwardRef, Provider } from '@angular/core';
+import { EventEmitter, forwardRef, OnDestroy, Output, Provider } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DayDate } from '../utils';
+
+import { Subscription } from 'rxjs/Subscription';
+
 import { DateConstraint } from '../constraint/dateconstraint.directive';
+import { DayDate } from '../utils';
 
-// TODO move out the validation part ? like a DateValidator directive instead of the Validator input
-
-export abstract class DatepickerSelect<T> implements ControlValueAccessor {
+export abstract class DatepickerSelect<T> implements ControlValueAccessor, OnDestroy {
 
   protected abstract get EMPTY_VALUE(): T
 
@@ -17,7 +18,7 @@ export abstract class DatepickerSelect<T> implements ControlValueAccessor {
 
   /**
    * Set the value without any check (except null) and emit an onDateChange event
-   * @param {T} value
+   * @param value
    */
   set value(value: T) {
      /* Use of a function so it can be overriden */
@@ -37,12 +38,14 @@ export abstract class DatepickerSelect<T> implements ControlValueAccessor {
   @Output()
   selectionChange = new EventEmitter<T>();
 
-  protected isDateValid: (date: DayDate) => boolean;
+  protected isDateValid: (date: DayDate) => boolean = () => true;
+  private sub: Subscription | undefined;
 
-  constructor(protected dateConstraint: DateConstraint | null) {
-    this.isDateValid = dateConstraint !== null ?
-      (date: DayDate) => dateConstraint.isDateValid(date) :
-      () => true;
+  constructor(dateConstraint: DateConstraint | null) {
+    if (dateConstraint !== null) {
+      this.isDateValid = (date: DayDate) => dateConstraint.isDateValid(date);
+      this.sub = dateConstraint.constraintChange.subscribe(() => this.updateValidity());
+    }
   }
 
   /* Value accessor stuff */
@@ -78,6 +81,8 @@ export abstract class DatepickerSelect<T> implements ControlValueAccessor {
     return this._selectDate(date);
   }
 
+  abstract updateValidity(): void;
+
   unselectDate(date: DayDate): boolean {
     if (!this.isDateSelected(date))
       return false;
@@ -94,6 +99,12 @@ export abstract class DatepickerSelect<T> implements ControlValueAccessor {
   }
 
   abstract isComplete(): boolean;
+
+  ngOnDestroy() {
+    if (this.sub !== undefined) {
+      this.sub.unsubscribe();
+    }
+  }
 }
 
 export function selectProviders(directiveClass: Function): Provider[] {

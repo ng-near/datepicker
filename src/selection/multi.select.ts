@@ -1,8 +1,8 @@
-import { Directive, Input, OnChanges, SimpleChanges, Optional } from '@angular/core';
+import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 
-import { DatepickerSelect, selectProviders } from './base.select';
-import { newDayDate, DayDate, isSameDay } from '../utils';
 import { DateConstraint } from '../constraint/dateconstraint.directive';
+import { DayDate, isSameDay, newDayDate } from '../utils';
+import { DatepickerSelect, selectProviders } from './base.select';
 
 @Directive({
   selector: '[multiSelect]',
@@ -44,16 +44,17 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
   ngOnChanges(changes: SimpleChanges) {
     let value = this.value;
 
-    if ('validator' in changes) {
-      let newValue = value.filter( d => this.isDateValid(d) );
-      if (newValue.length < value.length)
-        value = newValue;
-    }
-
     if ('limit' in changes && value.length > this.limit)
       value = value.slice(0, this.limit);
 
     this.value = value;
+  }
+
+  updateValidity() {
+    const newValue = this.value.filter( d => this.isDateValid(d) );
+    if (newValue.length < this.value.length) {
+      this.value = newValue;
+    }
   }
 
   _selectDate(date: DayDate): boolean {
@@ -66,7 +67,7 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
   }
 
   unselectDate(date: DayDate): boolean {
-    let newValue = this.value.filter( d => !isSameDay(d, date) );
+    const newValue = this.value.filter( d => !isSameDay(d, date) );
     if (newValue.length < this.value.length) {
       this.value = newValue;
       return true;
