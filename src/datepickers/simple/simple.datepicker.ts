@@ -1,9 +1,8 @@
-import { Component, Input, NgModule, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, FormStyle, getLocaleDayNames, TranslationWidth } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Inject, Input, LOCALE_ID, NgModule } from '@angular/core';
 
+import { DatepickerModule } from '../../module';
 import { newMonthDate } from '../../utils';
-
-// TODO improve build system to automatically inline template and style from url.
 
 @Component({
   selector: 'simple-datepicker',
@@ -15,7 +14,7 @@ import { newMonthDate } from '../../utils';
         <button *ngIf="last" (click)="months = navigator.moveMonth(1)">&gt;</button>
       </div>
       <div class="weekNames">
-        <span *forWeekdayNames="let wd for 'short'">{{ wd }}</span>
+        <span *ngFor="let wd of dayNames">{{ wd }}</span>
       </div>
       <div class="days">
         <span *forMonthday="let d of month; sixWeeks: true; today as today; currentMonth as currMonth"
@@ -61,11 +60,15 @@ import { newMonthDate } from '../../utils';
 })
 export class SimpleDatepicker {
 
+  dayNames: string[];
+
   @Input() months: Date[] = [newMonthDate()];
 
-}
+  constructor(@Inject(LOCALE_ID) private locale: string) {
+    this.dayNames = getLocaleDayNames(locale, FormStyle.Standalone, TranslationWidth.Narrow)
+  }
 
-import { DatepickerModule } from '../../module';
+}
 
 @NgModule({
   imports: [

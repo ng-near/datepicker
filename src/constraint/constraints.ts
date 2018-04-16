@@ -22,7 +22,10 @@ export const DateConstraints = {
     } : null;
   },
 
-  InvalidateWeekend: <DateConstraintFn>((date: Date) => date.getDay() !== 0 && date.getDay() !== 6 ? null : {
-    disabledWeekend: true
-  })
+  // TODO use locale to define weekend ?
+  InvalidateWeekend(date: Date) {
+    return date.getDay() !== 0 && date.getDay() !== 6 ? null : {
+      disabledWeekend: true
+    };
+  }
 }

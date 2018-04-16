@@ -1,21 +1,15 @@
-import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-
-import { SingleSelect } from './selection/single.select';
-import { MultiSelect } from './selection/multi.select';
-import { RangeSelect } from './selection/range.select';
+import { NgModule } from '@angular/core';
 
 import { DateConstraint } from './constraint/dateconstraint.directive';
-
 import { ForMonthOf } from './display/formonth';
-import { ForWeekdayNamesFor } from './display/forweekdaynames';
 import { ForMonthday } from './display/formonthday';
-import { ForMonthNamesFor } from './display/formonthnames';
-
 import { SelectClass } from './display/selectclass';
-
-
+import { MultiSelect } from './selection/multi.select';
+import { RangeSelect } from './selection/range.select';
+import { SingleSelect } from './selection/single.select';
 import { TodayProvider } from './today';
+
 
 const decl_exports = [
   SingleSelect,
@@ -25,9 +19,7 @@ const decl_exports = [
   DateConstraint,
 
   ForMonthOf,
-  ForWeekdayNamesFor,
   ForMonthday,
-  ForMonthNamesFor,
 
   SelectClass
 ];

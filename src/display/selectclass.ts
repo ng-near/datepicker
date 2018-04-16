@@ -25,13 +25,13 @@ const enum DayState {
 };
 
 export interface StateClassesName {
-  invalid: string;
-  valid: string;
-  inSelection: string;
-  selected: string;
+  invalid?: string;
+  valid?: string;
+  inSelection?: string;
+  selected?: string;
 }
 
-export const STATE_CLASSES = new InjectionToken('');
+export const STATE_CLASSES = new InjectionToken<StateClassesName>('');
 
 @Directive({
   selector: '[selectClass]'
@@ -50,7 +50,7 @@ export class SelectClass implements OnChanges, OnDestroy {
 
   constructor (
     private select: DatepickerSelect<any>,
-    @Optional() @Inject(STATE_CLASSES) private stateClasses: Partial<StateClassesName> | null,
+    @Optional() @Inject(STATE_CLASSES) private stateClasses: StateClassesName | null,
     @Optional() private dateConstraint: DateConstraint,
     private elRef: ElementRef,
     private renderer: Renderer) {
@@ -109,7 +109,7 @@ export class SelectClass implements OnChanges, OnDestroy {
   }
 
 
-  updateStateClass(state: DayState) {
+  private updateStateClass(state: DayState) {
     if (state !== this.selectState) {
       this.renderer.addClass(this.elRef.nativeElement, this.getClass(state));
       this.renderer.removeClass(this.elRef.nativeElement, this.getClass(this.selectState));
