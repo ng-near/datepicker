@@ -10,8 +10,6 @@ export { DateConstraint } from './constraint/dateconstraint.directive';
 
 export { DateNavigator, ForMonthOf } from './display/formonth';
 export { ForMonthday } from './display/formonthday';
-export { ForMonthNamesFor } from './display/formonthnames';
-export { ForWeekdayNamesFor } from './display/forweekdaynames';
 
 export { SelectClass } from './display/selectclass';
 
