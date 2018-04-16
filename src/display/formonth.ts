@@ -1,6 +1,17 @@
-import { Directive, Input, DefaultIterableDiffer, OnChanges, TemplateRef, ViewContainerRef, EmbeddedViewRef } from '@angular/core';
 import { NgForOfContext } from '@angular/common';
+import {
+  DefaultIterableDiffer,
+  Directive,
+  EmbeddedViewRef,
+  Input,
+  OnChanges,
+  TemplateRef,
+  ViewContainerRef
+} from '@angular/core';
+
 import { DatepickerSelect } from '../selection/base.select';
+
+// TODO remove differ, force the usage of immutable Date and do a simple loop over new value should be enough here
 
 export class DateNavigator {
   constructor(public months: Date[] = []) {}
@@ -36,7 +47,7 @@ export class DateNavigator {
 
   private changeMonth(mapFn: (date: Date) => Date, monthDate?: Date) {
     const isMonthUndefined = monthDate === undefined;
-    return this.months = this.months.map( (d, i) =>
+    return this.months.map( (d, i) =>
       isMonthUndefined || d === monthDate ? mapFn(d) : d
     );
   }
@@ -50,10 +61,12 @@ export class MonthContext extends NgForOfContext<Date> {
      super($implicit, null!, -1, -1);
   }
 
-  update(months: Date[], index: number) {
+  get count() { return (<Date[]>this.ngForOf).length; }
+
+  set count(c: number) { /* noop, only avoiding error from NgForOfContext */ }
+
+  setMonths(months: Date[]) {
     this.navigator.months = this.ngForOf = months;
-    this.index = index;
-    this.count = months.length;
   }
 }
 
@@ -62,15 +75,14 @@ export class MonthContext extends NgForOfContext<Date> {
 })
 export class ForMonthOf implements OnChanges {
 
-  @Input('forMonthOf') months: Date[];
+  @Input('forMonthOf') months: Date[] | null | undefined;
 
-  // could also use `date.getFullYear() + '.' + date.getMonh()` I believe number operations are faster than string
-  private differ = new DefaultIterableDiffer<Date>( (index, date) => date.getFullYear() + 10000 * date.getMonth())
+  private differ = new DefaultIterableDiffer<Date>(index => index)
 
   constructor(private template: TemplateRef<MonthContext>, private viewContainer: ViewContainerRef, private select: DatepickerSelect<any>) {}
 
   ngOnChanges() {
-    const changes = this.differ.diff(this.months);
+    const changes = this.differ.diff(this.months!);
     if (changes) {
       changes.forEachOperation( (record, adjustedPreviousIndex, currentIndex) => {
         // added
@@ -86,13 +98,21 @@ export class ForMonthOf implements OnChanges {
         else {
           const view = <EmbeddedViewRef<MonthContext>>this.viewContainer.get(adjustedPreviousIndex!)!;
           this.viewContainer.move(view, currentIndex);
-          view.context.$implicit = record.item;
+          // view.context.$implicit = record.item;
         }
       });
 
+      // if we get inside the loop this means this.months isn't null
+      const months = this.months!;
       for (let i = 0, ilen = this.viewContainer.length; i < ilen; i++) {
-        const view = <EmbeddedViewRef<MonthContext>>this.viewContainer.get(i);
-        view.context.update(this.months, i);
+        const context = (<EmbeddedViewRef<MonthContext>>this.viewContainer.get(i)).context;
+
+        // not always needed but feels better to do it here
+        // rather than going through another loop with only the views that need $implicit update
+        context.$implicit = months[i];
+
+        context.setMonths(months!);
+        context.index = i;
       }
     }
   }
