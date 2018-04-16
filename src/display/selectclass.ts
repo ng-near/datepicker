@@ -83,7 +83,7 @@ export class SelectClass implements OnChanges, OnDestroy {
 
   private updateSelection() {
     if (this.selectState !== DayState.INVALID) {
-      const state = this.getValidityState() || DayState.VALID;
+      const state = this.getSelectionState() || DayState.VALID;
       this.updateStateClass(state);
     }
   }
