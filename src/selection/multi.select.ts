@@ -50,14 +50,14 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
     this.value = value;
   }
 
-  updateValidity() {
+  protected updateValidity() {
     const newValue = this.value.filter( d => this.isDateValid(d) );
     if (newValue.length < this.value.length) {
       this.value = newValue;
     }
   }
 
-  _selectDate(date: DayDate): boolean {
+  protected _selectDate(date: DayDate): boolean {
     if (this.isComplete())
       return false;
 
@@ -77,7 +77,7 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
   }
 
   /* unused */
-  _unselectDate(date: DayDate): boolean { return false; }
+  protected _unselectDate(date: DayDate): boolean { return false; }
 
   isDateSelected(date: DayDate): boolean {
     return !!this.value.find( d => isSameDay(d, date) );

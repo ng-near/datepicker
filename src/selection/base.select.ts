@@ -81,7 +81,7 @@ export abstract class DatepickerSelect<T> implements ControlValueAccessor, OnDes
     return this._selectDate(date);
   }
 
-  abstract updateValidity(): void;
+  protected abstract updateValidity(): void;
 
   unselectDate(date: DayDate): boolean {
     if (!this.isDateSelected(date))

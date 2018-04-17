@@ -40,21 +40,21 @@ export class RangeSelect extends DatepickerSelect<RangeDate> {
     }
   }
 
-  setStartDate(date: DayDate | null) {
+  private setStartDate(date: DayDate | null) {
     this.value = {
       start: date, //clone ?
       end: this.value.end
     };
   }
 
-  setEndDate(date: DayDate | null) {
+  private setEndDate(date: DayDate | null) {
     this.value = {
       start: this.value.start,
       end: date //clone ?
     };
   }
 
-  updateValidity() {
+  protected updateValidity() {
     let start = this.value.start,
        end = this.value.end;
 
@@ -71,7 +71,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate> {
       };
   }
 
-  _selectDate(date: DayDate): boolean {
+  protected _selectDate(date: DayDate): boolean {
     let start = this.value.start,
         end = this.value.end;
 
@@ -103,7 +103,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate> {
     return true;
   }
 
-  _unselectDate(date: DayDate): boolean {
+  protected _unselectDate(date: DayDate): boolean {
     if (this.value.start !== null && isSameDay(date, this.value.start)) {
       this.setStartDate(null);
       return true;

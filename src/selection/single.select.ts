@@ -23,12 +23,12 @@ export class SingleSelect extends DatepickerSelect<DayDate | null> {
     super(dateConstraint);
   }
 
-  _selectDate(date: DayDate) {
+  protected _selectDate(date: DayDate) {
     this.value = date;
     return true;
   }
 
-  _unselectDate(date: DayDate) {
+  protected _unselectDate(date: DayDate) {
     this.value = null;
     return true;
   }
@@ -37,7 +37,7 @@ export class SingleSelect extends DatepickerSelect<DayDate | null> {
     return isSameDay(date, this.value);
   }
 
-  updateValidity() {
+  protected updateValidity() {
     if (this.value !== null && !this.isDateValid(this.value)) {
       this.value = null;
     }
