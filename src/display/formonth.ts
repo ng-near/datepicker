@@ -11,44 +11,46 @@ import {
 
 import { DatepickerSelect } from '../selection/base.select';
 
-// TODO remove differ, force the usage of immutable Date and do a simple loop over new value should be enough here
-
 export class DateNavigator {
   constructor(public months: Date[] = []) {}
 
-  moveMonth(amount: number, monthDate?: Date) {
+  shiftMonth(amount: number, idx?: number) {
     if (amount === 0)
       return this.months;
 
-      return this.changeMonth(date => new Date(date.getFullYear(), date.getMonth() + amount), monthDate);
+      return this.changeMonths(date => new Date(date.getFullYear(), date.getMonth() + amount), idx);
   }
 
-  moveYear(amount: number, monthDate?: Date) {
+  shiftYear(amount: number, idx?: number) {
     if (amount === 0)
       return this.months;
 
-    return this.changeMonth(date => new Date(date.getFullYear() + amount, date.getMonth()), monthDate);
+    return this.changeMonths(date => new Date(date.getFullYear() + amount, date.getMonth()), idx);
   }
 
-  toMonth(month: number, monthDate?: Date) {
-    if ( month < 0 || month > 11 ||
-      monthDate === undefined ? this.months.every(d => d.getMonth() === month) : month === monthDate.getMonth())
-      return this.months;
+  toMonth(month: number, idx: number) {
+    if ( month >= 0 && month < 12) {
+      const currentMonth = this.months[idx];
+      if (currentMonth !== undefined && currentMonth.getMonth() !== month) {
+        return this.changeMonths(date => new Date(date.getFullYear(), month), idx);
+      }
+    }
 
-    return this.changeMonth(date => new Date(date.getFullYear(), month), monthDate);
+    return this.months;
   }
 
-  toYear(year: number, monthDate?: Date) {
-    if ( monthDate === undefined ? this.months.every(d => d.getFullYear() === year) : year === monthDate.getFullYear())
-      return this.months;
+  toYear(year: number, idx: number) {
+    const currentMonth = this.months[idx];
+    if ( currentMonth !== undefined && currentMonth.getFullYear() !== year) {
+      return this.changeMonths(date => new Date(year, date.getMonth()), idx);
+    }
 
-    return this.changeMonth(date => new Date(year, date.getMonth()), monthDate);
+    return this.months;
   }
 
-  private changeMonth(mapFn: (date: Date) => Date, monthDate?: Date) {
-    const isMonthUndefined = monthDate === undefined;
+  private changeMonths(mapFn: (date: Date) => Date, idx?: number) {
     return this.months.map( (d, i) =>
-      isMonthUndefined || d === monthDate ? mapFn(d) : d
+      idx === undefined || i === idx ? mapFn(d) : d
     );
   }
 }
@@ -69,6 +71,8 @@ export class MonthContext extends NgForOfContext<Date> {
     this.navigator.months = this.ngForOf = months;
   }
 }
+
+// TODO remove differ, force the usage of immutable Date and do a simple loop over new value should be enough here
 
 @Directive({
   selector: '[forMonth][forMonthOf]'
