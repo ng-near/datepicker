@@ -6,101 +6,111 @@ import { Subscription } from 'rxjs/Subscription';
 import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate } from '../utils';
 
-export abstract class DatepickerSelect<T> implements ControlValueAccessor, OnDestroy {
+export interface EmitOptions {
+    emitEvent?: boolean;
+    emitModelToViewChange?: boolean;
+    emitViewToModelChange?: boolean;
+}
 
-  protected abstract get EMPTY_VALUE(): T
-
-  private _value = this.EMPTY_VALUE;
+export abstract class DatepickerSelect<T, R = void> implements ControlValueAccessor, OnDestroy {
 
   get value(): T {
     return this._value;
   }
 
-  /**
-   * Set the value without any check (except null) and emit an onDateChange event
-   * @param value
-   */
-  set value(value: T) {
-     /* Use of a function so it can be overriden */
-    this._setValue(value);
-  }
-
-  // TODO add an emitEvent parameter ? We would have to delete the setter
-  protected _setValue(value: T) {
-    if (value !== this._value) {
-      this._value = value || this.EMPTY_VALUE;
-
-      this.onChangeCallback(this._value);
-      this.selectionChange.emit(this._value);
-    }
-  }
-
   @Output()
   selectionChange = new EventEmitter<T>();
 
-  protected isDateValid: (date: DayDate) => boolean = () => true;
+  protected isValid: (date: DayDate) => boolean = d => true;
   private sub: Subscription | undefined;
 
-  constructor(dateConstraint: DateConstraint | null) {
+  constructor(private _value: T, dateConstraint: DateConstraint | null) {
     if (dateConstraint !== null) {
-      this.isDateValid = (date: DayDate) => dateConstraint.isDateValid(date);
+      this.isValid = (date: DayDate) => dateConstraint.isDateValid(date);
       this.sub = dateConstraint.constraintChange.subscribe(() => this.updateValidity());
     }
   }
 
   /* Value accessor stuff */
-  public onTouchedCallback: () => void = () => { };
-  private onChangeCallback: (_: T) => void = () => { };
+  protected onTouchedCallback: () => void = () => { };
+  private onChangeCallback: (_: T, emit?: boolean) => void = () => { };
 
-  // TODO should we check that the value match SelectDirective's expected value type ?
-  // If so how ?
-  // TODO use setValue() ?
-  writeValue(value: T) {
-    this.value = value;
+  public writeValue(value: any) {
+    // TODO assert/convert type ?
+    this.setValue(value, {emitModelToViewChange: false});
   }
 
-  registerOnChange(fn: (_: T) => void) {
+  public registerOnChange(fn: (_: T) => void) {
     this.onChangeCallback = fn;
   }
 
-  registerOnTouched(fn: () => void) {
+  public registerOnTouched(fn: () => void) {
     this.onTouchedCallback = fn;
   }
   /* */
 
-  abstract setValue(value: T): void
+  public setValue(value: T, options: EmitOptions = {}) {
+    if (value !== this._value) {
+      this._value = value
 
+      if (options.emitModelToViewChange !== false) {
+        this.onChangeCallback(value, options.emitViewToModelChange !== false);
+      }
 
-  selectDate(date: DayDate): boolean {
-    if (!date || !this.isDateValid(date))
-      return false;
+      if (options.emitEvent !== false) {
+        this.selectionChange.emit(value);
+      }
+    }
+  }
 
-    if (this.unselectDate(date))
-      return false;
+  public select(date: DayDate, extra?: R): void;
+  /* we shouldn't select a null/undefined date so we don't exposed it on signature
+   * but let's still handle it.
+   */
+  public select(date: DayDate | null | undefined, extra?: R) {
+    if (date && this.isValid(date) &&
+      (this.remove(date, extra) || this.add(date, extra))) {
+      this.onTouchedCallback();
+    }
+  }
 
-    return this._selectDate(date);
+  public unselect(date: DayDate, extra?: R) {
+    if (date && this.remove(date, extra)) {
+      this.onTouchedCallback();
+    }
+  }
+
+  public isInSelection(date: DayDate): boolean {
+    return false;
   }
 
   protected abstract updateValidity(): void;
 
-  unselectDate(date: DayDate): boolean {
-    if (!this.isDateSelected(date))
-      return false;
+  /**
+   * Add a date to the selection, that function can failed and not add the date.
+   * @param date a valid and non-selected date (no need to redo the checks)
+   * @param extra possible extra argument passed by selectDate.
+   * @returns whether or not the date was effectively added.
+   */
+  protected abstract add(date: DayDate, extra?: R): boolean;
 
-    return this._unselectDate(date);
-  }
+  /**
+   * Try to remove a daily equivalent date from the selection.
+   * If the date express the same day as a selected date, that date should be removed.
+   * @param date to be removed from the selection if equivalent day is present.
+   * @param extra possible extra argument passed by selectDate.
+   * @returns whether or not the date was effectively removed.
+   */
+  protected abstract remove(date: DayDate, extra?: R): boolean;
 
-  protected abstract _selectDate(date: DayDate): boolean
-  protected abstract _unselectDate(date: DayDate): boolean
-  abstract isDateSelected(date: DayDate): boolean
+  public abstract isSelected(date: DayDate): boolean;
 
-  isDateInSelection(date: DayDate): boolean {
-    return this.isDateSelected(date);
-  }
+  /**
+   * @returns true if the selection is full.
+   */
+  public abstract isComplete(): boolean;
 
-  abstract isComplete(): boolean;
-
-  ngOnDestroy() {
+  public ngOnDestroy() {
     if (this.sub !== undefined) {
       this.sub.unsubscribe();
     }

@@ -1,5 +1,5 @@
 export function isValidNumber(n: number | undefined | null): n is number {
-  return n !== null && !isNaN(n!);
+  return n != null && !isNaN(n!);
 }
 
 export type DayDate = Date;
@@ -23,15 +23,17 @@ export function newMonthDate(millis?: number): MonthDate {
   return date;
 }
 
-export function isSameDay(date1: Date | null, date2: Date | null) {
-  return date1 !== null && date2 !== null &&
+export function isSameDay(date1: Date | null | undefined, date2: Date | null | undefined) {
+  return date1 === date2 || (
+    date1 != null && date2 != null &&
     date1.getDate() === date2.getDate() &&
     date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear();
+    date1.getFullYear() === date2.getFullYear()
+  );
 }
 
 export function isSameMonth(date1: Date | null, date2: Date | null) {
-  return date1 !== null && date2 !== null &&
+  return date1 != null && date2 != null &&
     date1.getMonth() === date2.getMonth() &&
     date1.getFullYear() === date2.getFullYear();
 }

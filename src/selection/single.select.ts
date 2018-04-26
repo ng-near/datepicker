@@ -4,42 +4,44 @@ import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate, isSameDay } from '../utils';
 import { DatepickerSelect } from './base.select';
 
+/**
+ * TODO docs
+ * following convention null => invalid, undefined => empty/not set
+ */
+
 @Directive({
   selector: '[singleSelect]',
   providers: [
     { provide: DatepickerSelect, useExisting: forwardRef(() => SingleSelect) }
   ]
 })
-export class SingleSelect extends DatepickerSelect<DayDate | null> {
-
-  protected get EMPTY_VALUE() { return null; };
-
-  setValue(value: DayDate) {
-    if ( !value || this.isDateValid(value) )
-      this.value = value;
-  }
+export class SingleSelect extends DatepickerSelect<DayDate | null | undefined> {
 
   constructor(@Optional() dateConstraint: DateConstraint) {
-    super(dateConstraint);
+    super(undefined, dateConstraint);
   }
 
-  protected _selectDate(date: DayDate) {
-    this.value = date;
+  protected add(date: DayDate) {
+    this.setValue(date);
     return true;
   }
 
-  protected _unselectDate(date: DayDate) {
-    this.value = null;
-    return true;
+  protected remove(date: DayDate) {
+    if (isSameDay(date, this.value)) {
+      this.setValue(undefined);
+      return true;
+    }
+
+    return false;
   }
 
-  isDateSelected(date: DayDate): boolean {
+  isSelected(date: DayDate): boolean {
     return isSameDay(date, this.value);
   }
 
   protected updateValidity() {
-    if (this.value !== null && !this.isDateValid(this.value)) {
-      this.value = null;
+    if (this.value != null && !this.isValid(this.value)) {
+      this.setValue(null);
     }
   }
 

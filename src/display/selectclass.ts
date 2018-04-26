@@ -76,8 +76,8 @@ export class SelectClass implements OnChanges, OnDestroy {
   }
 
   private getSelectionState() {
-    return this.select.isDateSelected(this.day) ? DayState.SELECTED :
-      this.select.isDateInSelection(this.day) ? DayState.IN_SELECTION :
+    return this.select.isSelected(this.day) ? DayState.SELECTED :
+      this.select.isInSelection(this.day) ? DayState.IN_SELECTION :
       null;
   }
 

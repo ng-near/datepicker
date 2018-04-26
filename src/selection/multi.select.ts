@@ -2,17 +2,13 @@ import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/c
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate, isSameDay, newDayDate } from '../utils';
-import { DatepickerSelect, selectProviders } from './base.select';
+import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 @Directive({
   selector: '[multiSelect]',
   providers: selectProviders(MultiSelect)
 })
-export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChanges {
-
-  protected get EMPTY_VALUE() {
-    return [];
-  }
+export class MultiSelect extends DatepickerSelect<DayDate[], void> implements OnChanges {
 
   private _limit = Infinity;
 
@@ -26,61 +22,57 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
   }
 
   constructor(@Optional() dateConstraint: DateConstraint) {
-    super(dateConstraint);
+    super([], dateConstraint);
   }
 
-  public setValue(dates: DayDate[]) {
-    if (dates != this.value) {
-      this.value = (dates || [])
-      .filter( d => this.isDateValid(d) )
-      //TODO TEST : be sure all js engine does not remove any element on
-      //  splice(0, -Infinity);
-      .splice(0, dates.length - this.limit)
-      .map( d => newDayDate(d.getTime()) )
-      .sort( (a, b) => <any>a - <any>b );
+  public setDate(date: Date, index: number, options?: EmitOptions) {
+    if (this.value[index] !== date) {
+      this.setValue([
+        ...this.value.slice(0, index),
+        newDayDate(date.getTime()),
+        ...this.value.slice(index + 1),
+      ], options);
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
     let value = this.value;
 
-    if ('limit' in changes && value.length > this.limit)
-      value = value.slice(0, this.limit);
-
-    this.value = value;
-  }
-
-  protected updateValidity() {
-    const newValue = this.value.filter( d => this.isDateValid(d) );
-    if (newValue.length < this.value.length) {
-      this.value = newValue;
+    if ('limit' in changes && value.length > this.limit) {
+      this.setValue(value.slice(0, this.limit));
     }
   }
 
-  protected _selectDate(date: DayDate): boolean {
-    if (this.isComplete())
-      return false;
+  protected filterValue(predicate: (date: DayDate) => boolean) {
+    const newValue = this.value.filter(predicate);
 
-    this.value = [...this.value, date]
-      .sort( (a, b) => a.getTime() - b.getTime());
-    return true;
-  }
-
-  unselectDate(date: DayDate): boolean {
-    const newValue = this.value.filter( d => !isSameDay(d, date) );
-    if (newValue.length < this.value.length) {
-      this.value = newValue;
+    if (newValue.length !== this.value.length) {
+      this.setValue(newValue);
       return true;
     }
 
     return false;
   }
 
-  /* unused */
-  protected _unselectDate(date: DayDate): boolean { return false; }
+  protected updateValidity() {
+    this.filterValue(d => this.isValid(d));
+  }
 
-  isDateSelected(date: DayDate): boolean {
-    return !!this.value.find( d => isSameDay(d, date) );
+  protected add(date: DayDate): boolean {
+    if (this.isComplete()) {
+      return false;
+    }
+
+    this.setValue([...this.value, date]);
+    return true;
+  }
+
+  protected remove(date: DayDate): boolean {
+    return this.filterValue(d => !isSameDay(d, date));
+  }
+
+  public isSelected(date: DayDate) {
+    return this.value.some(d => isSameDay(d, date));
   }
 
   isComplete(): boolean {

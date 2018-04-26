@@ -1,136 +1,118 @@
-import { Directive, Optional } from '@angular/core';
+import { Directive, Input, Optional } from '@angular/core';
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate, isSameDay } from '../utils';
-import { DatepickerSelect, selectProviders } from './base.select';
+import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 export interface RangeDate {
-  start: DayDate | null;
-  end: DayDate | null;
+  start?: DayDate | null | undefined;
+  end?: DayDate | null | undefined;
 }
+
+/**
+ * TODO docs
+ * following convention null => invalid, undefined => empty/not set
+ */
 
 @Directive({
   selector: '[rangeSelect]',
   providers: selectProviders(RangeSelect)
 })
-export class RangeSelect extends DatepickerSelect<RangeDate> {
+export class RangeSelect extends DatepickerSelect<RangeDate, boolean> {
 
-  protected get EMPTY_VALUE(): RangeDate {
-    return {
-        start: null,
-        end: null
-      };
-  };
+  // TODO input name and maybe function signature. Allow string for most common strategy ?
+  @Input()
+  detectStrategy: (value: RangeDate, selectedDate: DayDate) => boolean = ({start, end}, date) =>
+    start != null && (end == null || Math.abs(date.getTime() - start.getTime()) > Math.abs(date.getTime() - end.getTime()))
 
   constructor(@Optional() dateConstraint: DateConstraint) {
-    super(dateConstraint);
+    super({}, dateConstraint);
   }
 
-  setValue(value: RangeDate) {
-    if (!value)
-      this.value = this.EMPTY_VALUE;
-    else if ( value !== this.value) {
-      if ( value.start !== null && !this.isDateValid(value.start) )
-        value.start = null;
+  public setValue(range: RangeDate, options?: EmitOptions) {
+    const { start, end } = range;
 
-      if ( value.end !== null && !this.isDateValid(value.end) )
-        value.end = null;
-
-      this.value = value;
+    if (start != null && end != null && start.getTime() > end.getTime()) {
+      range = {start: end, end: start};
     }
+
+    super.setValue(range, options);
   }
 
-  private setStartDate(date: DayDate | null) {
-    this.value = {
-      start: date, //clone ?
-      end: this.value.end
-    };
-  }
 
-  private setEndDate(date: DayDate | null) {
-    this.value = {
-      start: this.value.start,
-      end: date //clone ?
-    };
+  public setDate(date: Date | null | undefined, setEnd = false, options?: EmitOptions) {
+    if (setEnd === true) {
+      this.setValue({...this.value, end: date}, options);
+    } else {
+      this.setValue({...this.value, start: date}, options);
+    }
   }
 
   protected updateValidity() {
-    let start = this.value.start,
-       end = this.value.end;
+    let start = this.value.start;
+    let end = this.value.end;
 
-    if ( this.value.start !== null && !this.isDateValid(this.value.start) )
+    if ( start != null && !this.isValid(start) ) {
       start = null;
+    }
 
-    if ( this.value.end !== null && !this.isDateValid(this.value.end) )
+    if ( end != null && !this.isValid(end) ) {
       end = null;
+    }
 
-    if ( start !== this.value.start || end !== this.value.end )
-      this.value = {
-        start: start,
-        end: end
-      };
+    if ( start !== this.value.start || end !== this.value.end ) {
+      this.setValue({ start, end});
+    }
   }
 
-  protected _selectDate(date: DayDate): boolean {
-    let start = this.value.start,
-        end = this.value.end;
+  selectStartDate(date: DayDate) {
+    return this.select(date, true);
+  }
 
-    if (!start)
-      start = date;
-    else if (!end)
-      end = date;
-    else {
-      if (Math.abs(date.getTime() - start.getTime()) <= Math.abs(date.getTime() - end.getTime()))
-        this.setStartDate(date);
-      else
-        this.setEndDate(date);
+  selectEndDate(date: DayDate) {
+    return this.select(date, false);
+  }
 
-      return true;
+  protected add(date: DayDate, selectEnd?: boolean) {
+
+    if (selectEnd == null) {
+      // Auto detect which one to select
+      selectEnd = this.detectStrategy(this.value, date);
     }
 
-    if (start && end && start.getTime() > end.getTime()) {
-      this.value = {
-        start: end,
-        end: start
-      };
-    }
-    else
-      this.value = {
-        start: start,
-        end: end
-      }
-
+    this.setDate(date, selectEnd);
     return true;
   }
 
-  protected _unselectDate(date: DayDate): boolean {
-    if (this.value.start !== null && isSameDay(date, this.value.start)) {
-      this.setStartDate(null);
+  protected remove(date: DayDate, selectEnd?: boolean) {
+    //if (selectEnd == null || selectEnd === false)
+    if (selectEnd !== true && isSameDay(date, this.value.start)) {
+      this.setDate(undefined, false);
       return true;
     }
 
-    if (this.value.end !== null && isSameDay(date, this.value.end)) {
-      this.setEndDate(null);
+    if (selectEnd !== false && isSameDay(date, this.value.end)) {
+      this.setDate(undefined, true);
       return true;
     }
 
     return false;
   }
 
-  isDateSelected(date: DayDate): boolean {
-    return date && (isSameDay(date, this.value.start) || isSameDay(date, this.value.end));
+  isSelected(date: DayDate) {
+    return isSameDay(date, this.value.start) || isSameDay(date, this.value.end);
   }
 
-  isDateInSelection(date: DayDate): boolean {
+  isInSelection(date: DayDate) {
     let start = this.value.start,
         end = this.value.end;
-    return start !== null && end !== null &&
+    return start != null && end != null &&
          date.getTime() >= start.getTime() &&
          date.getTime() <= end.getTime();
   }
 
-  isComplete(): boolean {
-    return !!this.value.start && !!this.value.end;
+  isComplete() {
+    return this.value.start != null && this.value.end != null;
   }
 }
 
