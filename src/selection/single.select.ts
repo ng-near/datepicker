@@ -1,7 +1,7 @@
 import { Directive, forwardRef, Optional } from '@angular/core';
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
-import { DayDate, isSameDay } from '../utils';
+import { DayDate, isSameDay } from '../utils/utils';
 import { DatepickerSelect } from './base.select';
 
 /**

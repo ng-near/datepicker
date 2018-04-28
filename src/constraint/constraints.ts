@@ -1,5 +1,5 @@
 import { newDayDate } from '..';
-import { DayDate, isSameDay } from '../utils';
+import { DayDate, isSameDay } from '../utils/utils';
 
 // TODO can date be null ? undefined ?
 export type DateConstraintFn = (date: DayDate) => {[key: string]: boolean} | null;

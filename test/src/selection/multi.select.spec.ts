@@ -1,5 +1,5 @@
 import { MultiSelect } from '../../../src/selection/multi.select';
-import { generateDay, MockConstraint, newMockConstraint } from './utils';
+import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
 
 describe('MultiSelect', () => {
   let constraint: MockConstraint;

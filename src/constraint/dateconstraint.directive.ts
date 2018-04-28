@@ -1,6 +1,7 @@
-import { Directive, Input, Output, EventEmitter } from '@angular/core';
+import { Directive, EventEmitter, Input, Output } from '@angular/core';
+
+import { DayDate } from '../utils/utils';
 import { DateConstraintFn } from './constraints';
-import { DayDate } from '../utils';
 
 @Directive({
   selector: '[dateConstraint]'

@@ -2,7 +2,7 @@ import { CommonModule, FormStyle, getLocaleDayNames, TranslationWidth } from '@a
 import { ChangeDetectionStrategy, Component, Inject, Input, LOCALE_ID, NgModule } from '@angular/core';
 
 import { DatepickerModule } from '../../module';
-import { newMonthDate } from '../../utils';
+import { newMonthDate } from '../../utils/utils';
 
 @Component({
   selector: 'simple-datepicker',

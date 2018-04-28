@@ -1,5 +1,5 @@
 import { SingleSelect } from '../../../src/selection/single.select';
-import { generateDay, MockConstraint, newMockConstraint } from './utils';
+import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
 
 describe('SingleSelect', () => {
   let constraint: MockConstraint;

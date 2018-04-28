@@ -1,10 +1,10 @@
-import { Optional, SkipSelf, InjectionToken, Provider } from '@angular/core';
+import { InjectionToken, Optional, Provider, SkipSelf } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { mapTo } from 'rxjs/operator/mapTo';
 import { timer } from 'rxjs/observable/timer';
+import { mapTo } from 'rxjs/operator/mapTo';
 
-import { DAY_MILLIS, newDayDate, DayDate } from './utils';
+import { DAY_MILLIS, DayDate, newDayDate } from './utils/utils';
 
 export const TODAY = new InjectionToken<BehaviorSubject<DayDate>>('today');
 

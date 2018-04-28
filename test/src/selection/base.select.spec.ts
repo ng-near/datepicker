@@ -1,5 +1,5 @@
 import { DatepickerSelect } from '../../../src/selection/base.select';
-import { generateDay, MockConstraint, newMockConstraint } from './utils';
+import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
 
 class EMPTY {}
 const EMPTY_VALUE = new EMPTY();

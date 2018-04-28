@@ -1,5 +1,5 @@
 import { RangeSelect } from '../../../src/selection/range.select';
-import { generateDay, MockConstraint, newMockConstraint } from './utils';
+import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
 
 describe('RangeSelect', () => {
   let constraint: MockConstraint;

@@ -13,6 +13,6 @@ export { ForMonthday } from './display/formonthday';
 
 export { SelectClass, STATE_CLASSES } from './display/selectclass';
 
-export * from './utils';
+export * from './utils/utils';
 
 export { SimpleDatepickerModule } from './datepickers/simple/simple.datepicker';

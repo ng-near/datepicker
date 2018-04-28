@@ -1,10 +1,19 @@
-import { Directive, Input, TemplateRef, ViewContainerRef, Inject, OnChanges, OnDestroy, EmbeddedViewRef } from '@angular/core';
+import {
+  Directive,
+  EmbeddedViewRef,
+  Inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  TemplateRef,
+  ViewContainerRef
+} from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
 import { TODAY } from '../today';
-import { WEEK_MILLIS, DAY_MILLIS, newMonthDate, DayDate, newDayDate, isSameDay } from '../utils';
+import { DAY_MILLIS, DayDate, isSameDay, newDayDate, newMonthDate, WEEK_MILLIS } from '../utils/utils';
 
 export interface ForMonthDayContext {
   $implicit: DayDate,

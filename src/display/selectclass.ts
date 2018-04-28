@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DatepickerSelect } from '../selection/base.select';
-import { DayDate } from '../utils';
+import { DayDate } from '../utils/utils';
 
 const enum DayState {
   INVALID = 'invalid',

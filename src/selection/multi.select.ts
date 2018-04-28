@@ -1,7 +1,7 @@
 import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
-import { DayDate, isSameDay, newDayDate } from '../utils';
+import { DayDate, isSameDay, newDayDate } from '../utils/utils';
 import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 @Directive({

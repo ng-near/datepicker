@@ -4,7 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
 
 import { DateConstraint } from '../constraint/dateconstraint.directive';
-import { DayDate } from '../utils';
+import { DayDate } from '../utils/utils';
 
 export interface EmitOptions {
     emitEvent?: boolean;

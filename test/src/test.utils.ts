@@ -1,6 +1,6 @@
 import { EventEmitter } from '@angular/core';
 
-import { DateConstraint } from '../../../src/constraint/dateconstraint.directive';
+import { DateConstraint } from '../../src/constraint/dateconstraint.directive';
 
 let i = 0;
 export function generateDay(id = i++) {
