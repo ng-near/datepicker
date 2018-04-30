@@ -1,4 +1,4 @@
-import './matchers';
+import '../matchers';
 
 import { DateMonths } from '../../../src/utils/date.months';
 

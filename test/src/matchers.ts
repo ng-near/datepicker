@@ -1,4 +1,4 @@
-import { isSameDay } from '../../../src/utils/utils';
+import { isSameDay } from '../../src/utils/utils';
 
 // custom matchers
 function iterableEquality<T>(compareFn: (actual: T, expected: T) => boolean) {
