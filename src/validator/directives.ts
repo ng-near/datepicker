@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Inject, InjectionToken, LOCALE_ID, OnChanges, OnDestroy, Type } from '@angular/core';
+import { Directive, EventEmitter, FactoryProvider, Inject, Injectable, InjectionToken, LOCALE_ID, OnChanges, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 import { DATE_CONSTRAINT, DATE_CONVERTER, DateConverterFn, DateValidator, DateValidatorFn } from './model';
@@ -187,6 +187,7 @@ export class NotWeekendDateConstraint extends AbstractNotWeekend { }
 export class NotWeekendDate extends AbstractNotWeekend { }
 
 /* -- Composed Constraint -- */
+@Injectable()
 export class DateConstraint implements OnDestroy {
   validate: DateValidatorFn = () => null;
 
@@ -209,11 +210,14 @@ export class DateConstraint implements OnDestroy {
   }
 }
 
-export const DateConstraintProvider = {
+export function DateConstraintFactory(validators: DateValidator[]) {
+  return validators == null || validators.length === 0 ? null : new DateConstraint(validators);
+}
+
+export const DateConstraintProvider: FactoryProvider = {
   provide: DateConstraint,
   deps: [DATE_CONSTRAINT],
-  useFactory: (validators: DateValidator[]) => validators == null || validators.length === 0 ? null :
-    new DateConstraint(validators),
+  useFactory: DateConstraintFactory,
 }
 
 export const VALIDATOR_DIRECTIVES = [
