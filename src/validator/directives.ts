@@ -1,5 +1,4 @@
-import { Directive, EventEmitter, Inject, InjectionToken, LOCALE_ID, OnChanges, Type } from '@angular/core';
-import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
+import { Directive, EventEmitter, Inject, InjectionToken, LOCALE_ID, OnChanges, OnDestroy, Type } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 import { DATE_CONSTRAINT, DATE_CONVERTER, DateConverterFn, DateValidator, DateValidatorFn } from './model';

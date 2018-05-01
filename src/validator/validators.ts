@@ -1,7 +1,6 @@
 import { getLocaleWeekEndRange } from '@angular/common';
 
-import { newDayDate } from '..';
-import { isSameDay } from '../utils/utils';
+import { isSameDay, newDayDate } from '../utils/utils';
 import { DateValidatorFn } from './model';
 
 export namespace DateValidators {
