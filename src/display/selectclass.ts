@@ -39,8 +39,8 @@ export class SelectClass implements OnChanges, OnDestroy {
 
   constructor (
     private select: DatepickerSelect<any>,
-    @Optional() @Inject(STATE_CLASSES) private stateClasses: StateClassesName | null,
-    @Optional() private dateConstraint: DateConstraint,
+    @Optional() @Inject(STATE_CLASSES) stateClasses: StateClassesName | null,
+    @Optional() dateConstraint: DateConstraint,
     private elRef: ElementRef,
     private renderer: Renderer) {
 
