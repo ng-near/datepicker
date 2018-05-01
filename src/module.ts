@@ -10,6 +10,8 @@ import { RangeSelect } from './selection/range.select';
 import { SingleSelect } from './selection/single.select';
 import { TodayProvider } from './today';
 
+import { SimpleForOf } from './utils/simplefor';
+import { DayNames, MonthNames, Years } from './display/pipes';
 
 const decl_exports = [
   SingleSelect,
@@ -17,6 +19,12 @@ const decl_exports = [
   RangeSelect,
 
   DateConstraint,
+
+  SimpleForOf,
+
+  DayNames,
+  MonthNames,
+  Years,
 
   ForMonthOf,
   ForMonthday,
