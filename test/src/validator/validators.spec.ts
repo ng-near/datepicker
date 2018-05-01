@@ -1,14 +1,16 @@
+
 import { registerLocaleData } from '@angular/common';
 
-import { DateConstraintFn, DateConstraints } from '../../../src/constraint/constraints';
+import { DateValidatorFn } from '../../../src/validator/model';
+import { DateValidators } from '../../../src/validator/validators';
 import { localeArAE } from './locale.ar-AE';
 
 describe('Constraints', () => {
   describe('minDate', () => {
-    let minDate: DateConstraintFn;
+    let minDate: DateValidatorFn;
 
     beforeEach(() => {
-      minDate = DateConstraints.minDate(new Date(2000, 0, 1));
+      minDate = DateValidators.minDate(new Date(2000, 0, 1));
     })
 
     it('should validate date after', () => {
@@ -24,17 +26,17 @@ describe('Constraints', () => {
     })
 
     it('should normalize minDate to a day (with time set to 0)', () => {
-      minDate = DateConstraints.minDate(new Date(2000, 0, 1, 10, 20));
+      minDate = DateValidators.minDate(new Date(2000, 0, 1, 10, 20));
 
       expect(minDate(new Date(2000, 0, 1))).toBe(null);
     })
   })
 
   describe('maxDate', () => {
-    let maxDate: DateConstraintFn;
+    let maxDate: DateValidatorFn;
 
     beforeEach(() => {
-      maxDate = DateConstraints.maxDate(new Date(2000, 0, 1));
+      maxDate = DateValidators.maxDate(new Date(2000, 0, 1));
     })
 
     it('should validate date before', () => {
@@ -50,7 +52,7 @@ describe('Constraints', () => {
     })
 
     it('should normalize maxDate to a day (with time set to 0)', () => {
-      maxDate = DateConstraints.maxDate(new Date(2000, 0, 1, 10, 20));
+      maxDate = DateValidators.maxDate(new Date(2000, 0, 1, 10, 20));
 
       expect(maxDate(new Date(2000, 0, 1))).toBe(null);
     })
@@ -59,14 +61,14 @@ describe('Constraints', () => {
   describe('disabledDates', () => {
 
     it('should work with empty array', () => {
-      const disabledDates = DateConstraints.disabledDates([]);
+      const disabledDates = DateValidators.disabledDates([]);
 
       expect(disabledDates(new Date(0))).toBe(null);
       expect(disabledDates(new Date(2000, 0))).toBe(null);
     })
 
     it('should invalidate dates disabled', () => {
-      const disabledDates = DateConstraints.disabledDates([
+      const disabledDates = DateValidators.disabledDates([
         new Date(2000, 1, 0),
         new Date(2000, 2, 0),
       ]);
@@ -76,7 +78,7 @@ describe('Constraints', () => {
     })
 
     it('should validate dates not disabled', () => {
-      const disabledDates = DateConstraints.disabledDates([
+      const disabledDates = DateValidators.disabledDates([
         new Date(2000, 1, 0),
         new Date(2000, 2, 0),
       ]);
@@ -86,7 +88,7 @@ describe('Constraints', () => {
     })
 
     it('should invalidate date even if time is not the same', () => {
-      const disabledDates = DateConstraints.disabledDates([
+      const disabledDates = DateValidators.disabledDates([
         new Date(2000, 1, 0, 10, 20),
       ]);
 
@@ -96,14 +98,14 @@ describe('Constraints', () => {
 
   describe('notWeekend', () => {
     it('should invalidate week-end dates', () => {
-      const notWeekend = DateConstraints.notWeekend('en-US');
+      const notWeekend = DateValidators.notWeekend('en-US');
 
       expect(notWeekend(new Date(2000, 0, 1))).not.toBe(null);
       expect(notWeekend(new Date(2000, 0, 2))).not.toBe(null);
     })
 
     it('should validate not week-end dates', () => {
-      const notWeekend = DateConstraints.notWeekend('en-US');
+      const notWeekend = DateValidators.notWeekend('en-US');
 
       expect(notWeekend(new Date(2000, 0, 3))).toBe(null);
       expect(notWeekend(new Date(2000, 0, 4))).toBe(null);
@@ -115,7 +117,7 @@ describe('Constraints', () => {
     it('should work with a locale where first weekend day number is smaller than last weekend day number', () => {
       registerLocaleData(localeArAE);
 
-      const notWeekend = DateConstraints.notWeekend('ar-AE');
+      const notWeekend = DateValidators.notWeekend('ar-AE');
 
       expect(notWeekend(new Date(2000, 0, 7))).not.toBe(null);
       expect(notWeekend(new Date(2000, 0, 8))).not.toBe(null);

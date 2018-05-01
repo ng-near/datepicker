@@ -5,9 +5,12 @@ export { SingleSelect } from './selection/single.select';
 export { MultiSelect } from './selection/multi.select';
 export { RangeSelect, RangeDate } from './selection/range.select';
 
-export { DateConstraintFn, DateConstraints } from './constraint/constraints';
-export { DateConstraint } from './constraint/dateconstraint.directive';
-
+export { DateValidators } from './validator/validators';
+export { MinDateValidator, MinDateConstraint, MinDate,
+  MaxDateValidator, MaxDateConstraint, MaxDate,
+  DisabledDatesValidator, DisabledDatesConstraint, DisabledDates,
+  NotWeekendDateValidator, NotWeekendDateConstraint, NotWeekendDate,
+  DateConstraint } from './validator/directives';
 export { DateNavigator, ForMonthOf } from './display/formonth';
 export { ForMonthday } from './display/formonthday';
 

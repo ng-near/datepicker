@@ -1,21 +1,10 @@
-import {
-  Directive,
-  ElementRef,
-  Inject,
-  InjectionToken,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Optional,
-  Renderer2 as Renderer,
-  SimpleChanges
-} from '@angular/core';
+import { Directive, ElementRef, Inject, InjectionToken, Input, OnChanges, OnDestroy, Optional, Renderer2 as Renderer, SimpleChanges } from '@angular/core';
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DatepickerSelect } from '../selection/base.select';
 import { DayDate } from '../utils/utils';
+import { DateConstraint } from '../validator/directives';
 
 const enum DayState {
   INVALID = 'invalid',
@@ -64,7 +53,7 @@ export class SelectClass implements OnChanges, OnDestroy {
     }
 
     if (dateConstraint !== null) {
-      this.getValidityState = () => dateConstraint.isDateValid(this.day) ? DayState.VALID : DayState.INVALID;
+      this.getValidityState = () => dateConstraint.validate(this.day) === null ? DayState.VALID : DayState.INVALID;
       this.subs.add(
         dateConstraint.constraintChange.subscribe( () => { this.updateValidity() })
       );

@@ -3,8 +3,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate } from '../utils/utils';
+import { DateConstraint, DateConstraintProvider } from '../validator/directives';
 
 export interface EmitOptions {
     emitEvent?: boolean;
@@ -24,10 +24,10 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
   protected isValid: (date: DayDate) => boolean = d => true;
   private sub: Subscription | undefined;
 
-  constructor(private _value: T, dateConstraint: DateConstraint | null) {
-    if (dateConstraint !== null) {
-      this.isValid = (date: DayDate) => dateConstraint.isDateValid(date);
-      this.sub = dateConstraint.constraintChange.subscribe(() => this.updateValidity());
+  constructor(private _value: T, dateConstraints: DateConstraint) {
+    if (dateConstraints != null) {
+      this.isValid = (date: DayDate) => dateConstraints.validate(date) === null;
+      this.sub = dateConstraints.constraintChange.subscribe(() => this.updateValidity());
     }
   }
 
@@ -119,7 +119,8 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
 
 export function selectProviders(directiveClass: Function): Provider[] {
   return [
-  { provide: DatepickerSelect, useExisting: forwardRef(() => directiveClass) },
-  { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => directiveClass), multi: true }
+    DateConstraintProvider,
+    { provide: DatepickerSelect, useExisting: forwardRef(() => directiveClass) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => directiveClass), multi: true }
   ];
 }

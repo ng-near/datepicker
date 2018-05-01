@@ -1,14 +1,14 @@
 import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 
-import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate, isSameDay, newDayDate } from '../utils/utils';
+import { DateConstraint } from '../validator/directives';
 import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 @Directive({
   selector: '[multiSelect]',
   providers: selectProviders(MultiSelect)
 })
-export class MultiSelect extends DatepickerSelect<DayDate[], void> implements OnChanges {
+export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChanges {
 
   private _limit = Infinity;
 

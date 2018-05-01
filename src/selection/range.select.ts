@@ -1,7 +1,7 @@
 import { Directive, Input, Optional } from '@angular/core';
 
-import { DateConstraint } from '../constraint/dateconstraint.directive';
 import { DayDate, isSameDay } from '../utils/utils';
+import { DateConstraint } from '../validator/directives';
 import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 export interface RangeDate {

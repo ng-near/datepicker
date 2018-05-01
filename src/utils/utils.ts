@@ -37,3 +37,21 @@ export function isSameMonth(date1: Date | null, date2: Date | null) {
     date1.getMonth() === date2.getMonth() &&
     date1.getFullYear() === date2.getFullYear();
 }
+
+export function convertDate(v: any) {
+  if (v instanceof Date) {
+    return v;
+  }
+
+  if (typeof v === 'object' && v.year != null && v.month != null) {
+    return new Date(v.year, v.month, v.day || v.date, v.hours, v.minutes, v.seconds, v.milliseconds);
+  }
+
+  const time = Date.parse(v);
+
+  if (Number.isNaN(time)) {
+    return null;
+  }
+
+  return new Date(time);
+}
