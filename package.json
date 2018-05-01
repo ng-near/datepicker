@@ -1,6 +1,6 @@
 {
   "name": "ng-imbadatepicker",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Angular Datepicker toolset",
   "typings": "dist/index.d.ts",
   "module": "dist/index.js",
@@ -47,6 +47,7 @@
   "peerDependencies": {
     "@angular/core": "^5.0.0",
     "@angular/common": "^5.0.0",
-    "@angular/platform-browser": "^5.0.0"
+    "@angular/forms": "^5.0.0",
+    "rxjs": "^5.5.2"
   }
 }
