@@ -1,12 +1,12 @@
-import { FormStyle, getLocaleDayNames, getLocaleMonthNames, getLocaleFirstDayOfWeek, TranslationWidth } from '@angular/common';
-import { Pipe, PipeTransform, Inject, LOCALE_ID } from '@angular/core';
+import { FormStyle, getLocaleDayNames, getLocaleFirstDayOfWeek, getLocaleMonthNames, TranslationWidth } from '@angular/common';
+import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core';
 
 export interface NameValue {
   name: string;
   value: number;
 }
 
-const translationWidthMap = {
+export const translationWidthMap = {
   'narrow': TranslationWidth.Narrow,
   'short': TranslationWidth.Short,
   'abbreviated': TranslationWidth.Abbreviated,
