@@ -1,12 +1,12 @@
 import { SingleSelect } from '../../../src/selection/single.select';
-import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
+import { generateDay, MockConstraint } from '../test.utils';
 
 describe('SingleSelect', () => {
   let constraint: MockConstraint;
   let select: SingleSelect;
 
   beforeEach(() => {
-    constraint = newMockConstraint();
+    constraint = new MockConstraint();
     select = new SingleSelect(constraint);
   })
 
@@ -82,7 +82,7 @@ describe('SingleSelect', () => {
   it('should update value on constraint update', () => {
     select.select(generateDay());
 
-    constraint.changeValidFn(() => false);
+    constraint.changeValidFn(() => ({}));
 
     expect(select.value).toBe(null);
   })

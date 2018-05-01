@@ -1,12 +1,12 @@
 import { RangeSelect } from '../../../src/selection/range.select';
-import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
+import { generateDay, MockConstraint } from '../test.utils';
 
 describe('RangeSelect', () => {
   let constraint: MockConstraint;
   let select: RangeSelect;
 
   beforeEach(() => {
-    constraint = newMockConstraint();
+    constraint = new MockConstraint();
     select = new RangeSelect(constraint);
   })
 
@@ -253,7 +253,7 @@ describe('RangeSelect', () => {
     };
     select.setValue(value);
 
-    constraint.changeValidFn(() => false);
+    constraint.changeValidFn(() => ({}));
 
     expect(select.value.start).toBe(null);
     expect(select.value.end).toBe(null);

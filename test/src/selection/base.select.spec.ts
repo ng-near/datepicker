@@ -1,5 +1,5 @@
 import { DatepickerSelect } from '../../../src/selection/base.select';
-import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
+import { generateDay, MockConstraint } from '../test.utils';
 
 class EMPTY {}
 const EMPTY_VALUE = new EMPTY();
@@ -32,7 +32,7 @@ describe('DatepickerSelect -', () => {
   let emitSpy: jasmine.Spy;
 
   beforeEach(() => {
-    constraint = newMockConstraint();
+    constraint = new MockConstraint();
     select = new MockSelect(constraint);
 
     emitToViewSpy = jasmine.createSpy('on change callback');
@@ -273,7 +273,7 @@ describe('DatepickerSelect -', () => {
       const date1 = generateDay();
       const date2 = generateDay();
 
-      constraint.changeValidFn(date => date !== date2);
+      constraint.changeValidFn(date => date !== date2 ? null : {});
 
       expect(select.isValid(date1)).toBe(true);
       expect(select.isValid(date2)).toBe(false);

@@ -1,31 +1,26 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, OnDestroy } from '@angular/core';
 
 import { DateConstraint } from '../../src/validator/directives';
+import { DateValidatorFn } from '../../src/validator/model';
 
 let i = 0;
 export function generateDay(id = i++) {
   return new Date(1970, 0, id);
 }
 
-class MockConstraintImpl {
+export class MockConstraint implements DateConstraint, OnDestroy {
 
-  constraintChange = new EventEmitter();
+  constraintChange = new EventEmitter<void>();
 
-  isDateValid(_d: Date) {
-    return true;
+  validate(_d: Date) {
+    return null;
   }
 
-  changeValidFn(validFn: (date: Date) => boolean) {
-    this.isDateValid = validFn;
+  changeValidFn(validFn: DateValidatorFn) {
+    this.validate = validFn;
 
     this.constraintChange.emit();
   }
-}
 
-export interface MockConstraint extends DateConstraint {
-  changeValidFn: (validFn: (date: Date) => boolean) => void;
-}
-
-export function newMockConstraint(): MockConstraint {
-  return new MockConstraintImpl() as any;
+  ngOnDestroy() { }
 }

@@ -1,12 +1,12 @@
 import { MultiSelect } from '../../../src/selection/multi.select';
-import { generateDay, MockConstraint, newMockConstraint } from '../test.utils';
+import { generateDay, MockConstraint } from '../test.utils';
 
 describe('MultiSelect', () => {
   let constraint: MockConstraint;
   let select: MultiSelect;
 
   beforeEach(() => {
-    constraint = newMockConstraint();
+    constraint = new MockConstraint();
     select = new MultiSelect(constraint);
   })
 
@@ -117,7 +117,7 @@ describe('MultiSelect', () => {
     select.select(value2);
     select.select(value3);
 
-    constraint.changeValidFn(d => d === value2);
+    constraint.changeValidFn(d => d === value2 ? null : {});
 
     expect(select.value).toEqual([value2]);
   })
