@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, FactoryProvider, Inject, Injectable, InjectionToken, LOCALE_ID, OnChanges, OnDestroy, Type } from '@angular/core';
+import { Directive, EventEmitter, FactoryProvider, Inject, Injectable, InjectionToken, LOCALE_ID, OnChanges, OnDestroy, Optional, Type } from '@angular/core';
 import { AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 import { DATE_CONSTRAINT, DATE_CONVERTER, DateConverterFn, DateValidator, DateValidatorFn } from './model';
@@ -216,7 +216,7 @@ export function DateConstraintFactory(validators: DateValidator[]) {
 
 export const DateConstraintProvider: FactoryProvider = {
   provide: DateConstraint,
-  deps: [DATE_CONSTRAINT],
+  deps: [[new Optional(), DATE_CONSTRAINT]],
   useFactory: DateConstraintFactory,
 }
 
