@@ -9,8 +9,8 @@ import { convertDate } from './index';
 import { MultiSelect } from './selection/multi.select';
 import { RangeSelect } from './selection/range.select';
 import { SingleSelect } from './selection/single.select';
-import { TodayProvider } from './today';
 import { SimpleForOf } from './utils/simplefor';
+import { Today } from './utils/today';
 import { VALIDATOR_DIRECTIVES } from './validator/directives';
 import { DATE_CONVERTER } from './validator/model';
 
@@ -42,9 +42,6 @@ export interface DatepickerConfig {
     CommonModule
   ],
   declarations: decl_exports,
-  providers: [
-    TodayProvider,
-  ],
   exports: [
     ...decl_exports,
     DatePipe
@@ -55,6 +52,7 @@ export class DatepickerModule {
     return {
       ngModule: DatepickerModule,
       providers: [
+        Today,
         { provide: DATE_CONVERTER, useValue: (config && config.convertDate) || convertDate }
       ]
     };

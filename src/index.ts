@@ -22,4 +22,6 @@ export { SelectClass, STATE_CLASSES } from './display/selectclass';
 export { DateMonths } from './utils/date.months';
 export * from './utils/utils';
 
+export { Today } from './utils/today';
+
 export { SimpleDatepickerModule } from './datepickers/simple/simple.datepicker';
