@@ -4,12 +4,25 @@ export class DateMonths implements Iterable<Date> {
 
   private months: Date[];
 
+  get size() {
+    return this.months.length;
+  }
+
   get month() {
     return this.months[0];
   }
 
   constructor(...months: Date[]) {
     this.months = months;
+  }
+
+  get(idx: number) {
+    return this.months[idx];
+  }
+
+  toArray() {
+    // TODO return freezed copy on DEV
+    return this.months;
   }
 
   [Symbol.iterator] = () => this.months[Symbol.iterator]();
