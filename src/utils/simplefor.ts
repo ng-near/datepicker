@@ -1,6 +1,7 @@
-import { Directive, Input, OnChanges, ViewContainerRef, TemplateRef, EmbeddedViewRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 
 export interface ImplicitContext<T> {
+  index: number;
   $implicit: T;
 }
 
@@ -10,7 +11,7 @@ export interface ImplicitContext<T> {
 export class SimpleForOf<T> implements OnChanges {
 
   @Input()
-  simpleForOf: T[];
+  simpleForOf: Iterable<T>;
 
   constructor(private viewContainer: ViewContainerRef, private template: TemplateRef<ImplicitContext<T>>) { }
 
@@ -18,21 +19,31 @@ export class SimpleForOf<T> implements OnChanges {
     const items = this.simpleForOf;
 
     const length = this.viewContainer.length;
-    const newLength = items.length;
 
-    // update existings
-    for (let i = 0, l = Math.min(length, newLength); i < l; i++) {
-      (<EmbeddedViewRef<ImplicitContext<T>>>this.viewContainer.get(i)).context.$implicit = items[i];
+    let it = items[Symbol.iterator]();
+
+    let i = 0;
+    let result: IteratorResult<T>;
+
+    // update existing
+    while ((result = it.next()).done !== true && i < length) {
+      const context = (<EmbeddedViewRef<ImplicitContext<T>>>this.viewContainer.get(i)).context;
+      context.index = i;
+      context.$implicit = items[i];
+      i++;
     }
 
-    // add new
-    for (let i = length; i < newLength; i++) {
-      this.viewContainer.createEmbeddedView(this.template, {$implicit: items[i]});
-    }
-
-    // remove extraneous
-    for (let i = length - 1; i >= newLength; i--) {
-      this.viewContainer.remove(i);
+    if (result.done !== true) {
+      // add new
+      do {
+        this.viewContainer.createEmbeddedView(this.template, {$implicit: items[i], index: i});
+        i++;
+      } while ((result = it.next()).done !== true)
+    } else {
+      // remove extraneous
+      for (; i < length; i++) {
+        this.viewContainer.remove(i);
+      }
     }
   }
 }
