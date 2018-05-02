@@ -29,14 +29,14 @@ export class SimpleForOf<T> implements OnChanges {
     while ((result = it.next()).done !== true && i < length) {
       const context = (<EmbeddedViewRef<ImplicitContext<T>>>this.viewContainer.get(i)).context;
       context.index = i;
-      context.$implicit = items[i];
+      context.$implicit = result.value;
       i++;
     }
 
     if (result.done !== true) {
       // add new
       do {
-        this.viewContainer.createEmbeddedView(this.template, {$implicit: items[i], index: i});
+        this.viewContainer.createEmbeddedView(this.template, {$implicit: result.value, index: i});
         i++;
       } while ((result = it.next()).done !== true)
     } else {
