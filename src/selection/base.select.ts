@@ -64,7 +64,7 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
   }
 
   public select(date: DayDate, extra?: R): void;
-  /* we shouldn't select a null/undefined date so we don't exposed it on signature
+  /* we shouldn't select a null/undefined date so we don't expose it on signature
    * but let's still handle it.
    */
   public select(date: DayDate | null | undefined, extra?: R) {
@@ -74,7 +74,8 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
     }
   }
 
-  public unselect(date: DayDate, extra?: R) {
+  public unselect(date: DayDate, extra?: R): void;
+  public unselect(date: DayDate | null | undefined, extra?: R) {
     if (date && this.remove(date, extra)) {
       this.onTouchedCallback();
     }
