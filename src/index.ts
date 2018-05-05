@@ -3,7 +3,7 @@ export { DatepickerModule } from './module';
 export { DatepickerSelect, selectProviders } from './selection/base.select';
 export { SingleSelect } from './selection/single.select';
 export { MultiSelect } from './selection/multi.select';
-export { RangeSelect, RangeDate } from './selection/range.select';
+export { RangeSelect, RangeSelectType, DetectStrategyFn, RangeDate } from './selection/range.select';
 
 export { DateValidators } from './validator/validators';
 export { MinDateValidator, MinDateConstraint, MinDate,

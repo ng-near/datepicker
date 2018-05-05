@@ -9,6 +9,15 @@ export interface RangeDate {
   end?: DayDate | null | undefined;
 }
 
+export const enum RangeSelectType {
+  NONE = 0,
+  START_DATE = 1,
+  END_DATE = 2,
+  BOTH_DATES = START_DATE | END_DATE,
+}
+
+export type DetectStrategyFn = (value: RangeDate, selectedDate: DayDate) => RangeSelectType;
+
 /**
  * TODO docs
  * following convention null => invalid, undefined => empty/not set
@@ -18,12 +27,25 @@ export interface RangeDate {
   selector: '[rangeSelect]',
   providers: selectProviders(RangeSelect)
 })
-export class RangeSelect extends DatepickerSelect<RangeDate, boolean> {
+export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
 
-  // TODO input name and maybe function signature. Allow string for most common strategy ?
+  // single function with a select/deselect boolean instead of 2 functions ?
+  // is unselectStrategy really useful ?
+  // Allow string for most common strategy ?
   @Input()
-  detectStrategy: (value: RangeDate, selectedDate: DayDate) => boolean = ({start, end}, date) =>
-    start != null && (end == null || Math.abs(date.getTime() - start.getTime()) > Math.abs(date.getTime() - end.getTime()))
+  selectStrategy: DetectStrategyFn = ({start, end}, date) => {
+    if (start == null && end == null) {
+      return RangeSelectType.BOTH_DATES;
+    }
+
+    return start == null || (end != null && Math.abs(date.getTime() - start.getTime()) < Math.abs(date.getTime() - end.getTime())) ?
+        RangeSelectType.START_DATE :
+        RangeSelectType.END_DATE
+    ;
+  };
+
+  @Input()
+  unselectStrategy: DetectStrategyFn = (value: RangeDate, unselectedDate: DayDate) => RangeSelectType.BOTH_DATES;
 
   constructor(@Optional() dateConstraint: DateConstraint) {
     super({}, dateConstraint);
@@ -39,13 +61,36 @@ export class RangeSelect extends DatepickerSelect<RangeDate, boolean> {
     super.setValue(range, options);
   }
 
+  /**
+   * Utility function because setDate() and remove() were really close code.
+   * @param predicate return true if date should be set.
+   * @param date
+   * @param setType
+   * @param options
+   */
+  private _setDate(predicate: (d: Date | null | undefined) => boolean, date: Date | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
+    if (setType !== RangeSelectType.NONE) {
+      let {start, end} = this.value;
 
-  public setDate(date: Date | null | undefined, setEnd = false, options?: EmitOptions) {
-    if (setEnd === true) {
-      this.setValue({...this.value, end: date}, options);
-    } else {
-      this.setValue({...this.value, start: date}, options);
+      if ((setType & RangeSelectType.START_DATE) > 0 && predicate(start)) {
+        start = date;
+      }
+
+      if ((setType & RangeSelectType.END_DATE) > 0 && predicate(end)) {
+        end = date;
+      }
+
+      if (start !== this.value.start || end !== this.value.end) {
+        this.setValue({start, end}, options);
+        return true;
+      }
     }
+
+    return false;
+  }
+
+  public setDate(date: Date | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
+    return this._setDate(d => !isSameDay(d, date), date, setType, options);
   }
 
   protected updateValidity() {
@@ -65,38 +110,20 @@ export class RangeSelect extends DatepickerSelect<RangeDate, boolean> {
     }
   }
 
+  /* alias function for easy use inside template (no enum ref)*/
   selectStartDate(date: DayDate) {
-    return this.select(date, true);
+    return this.select(date, RangeSelectType.START_DATE);
   }
-
   selectEndDate(date: DayDate) {
-    return this.select(date, false);
+    return this.select(date, RangeSelectType.END_DATE);
   }
 
-  protected add(date: DayDate, selectEnd?: boolean) {
-
-    if (selectEnd == null) {
-      // Auto detect which one to select
-      selectEnd = this.detectStrategy(this.value, date);
-    }
-
-    this.setDate(date, selectEnd);
-    return true;
+  protected add(date: DayDate, selectType = this.selectStrategy(this.value, date)) {
+    return this.setDate(date, selectType);
   }
 
-  protected remove(date: DayDate, selectEnd?: boolean) {
-    //if (selectEnd == null || selectEnd === false)
-    if (selectEnd !== true && isSameDay(date, this.value.start)) {
-      this.setDate(undefined, false);
-      return true;
-    }
-
-    if (selectEnd !== false && isSameDay(date, this.value.end)) {
-      this.setDate(undefined, true);
-      return true;
-    }
-
-    return false;
+  protected remove(date: DayDate, deselectType = this.unselectStrategy(this.value, date)) {
+    return this._setDate(d => isSameDay(d, date), undefined, deselectType);
   }
 
   isSelected(date: DayDate) {

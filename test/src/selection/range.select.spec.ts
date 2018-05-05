@@ -1,4 +1,4 @@
-import { RangeSelect } from '../../../src/selection/range.select';
+import { RangeSelect, RangeSelectType } from '../../../src/selection/range.select';
 import { generateDay, MockConstraint } from '../test.utils';
 
 describe('RangeSelect', () => {
@@ -34,21 +34,48 @@ describe('RangeSelect', () => {
   })
 
   it('should set start date', () => {
-    const value = generateDay();
+    const { end } = select.value;
+    const date = generateDay();
 
-    select.setDate(value);
+    expect(select.setDate(date, RangeSelectType.START_DATE)).toBe(true);
 
-    expect(select.value.start).toBe(value);
-    expect(select.value.end).toBe(undefined);
+    expect(select.value.start).toBe(date);
+    expect(select.value.end).toBe(end);
   })
 
-  it('should set stop date', () => {
-    const value = generateDay();
+  it('should set end date', () => {
+    const { start } = select.value;
+    const date = generateDay();
 
-    select.setDate(value, true);
+    expect(select.setDate(date, RangeSelectType.END_DATE)).toBe(true);
 
-    expect(select.value.start).toBe(undefined);
-    expect(select.value.end).toBe(value);
+    expect(select.value.start).toBe(start);
+    expect(select.value.end).toBe(date);
+  })
+
+  it('should set both date', () => {
+    const date = generateDay();
+
+    expect(select.setDate(date, RangeSelectType.BOTH_DATES)).toBe(true);
+
+    expect(select.value.start).toBe(date);
+    expect(select.value.end).toBe(date);
+  })
+
+  it('should not set any date', () => {
+    const prevValue = select.value;
+    const date = generateDay();
+
+    expect(select.setDate(date, RangeSelectType.NONE)).toBe(false);
+    expect(select.value).toBe(prevValue);
+  })
+
+  it('should not reset same date', () => {
+    const value = {start: generateDay(), end: generateDay()};
+    select.setValue(value);
+
+    expect(select.setDate(new Date(value.start), RangeSelectType.START_DATE)).toBe(false);
+    expect(select.value).toBe(value);
   })
 
   it('should select start date then end date', () => {
@@ -62,105 +89,147 @@ describe('RangeSelect', () => {
     expect(select.value.end).toBe(end);
   })
 
-  it('should select end date', () => {
-    const end = generateDay();
+  it('should always select start date', () => {
+    const date1 = generateDay();
+    const date2 = generateDay();
+    const date3 = generateDay();
 
-    select.select(end, true);
+    select.select(date1, RangeSelectType.START_DATE);
+    expect(select.value.start).toBe(date1);
+    expect(select.value.end).toBe(undefined);
 
-    expect(select.value.end).toBe(end);
+    select.select(date2, RangeSelectType.START_DATE);
+    expect(select.value.start).toBe(date2);
+    expect(select.value.end).toBe(undefined);
+
+    select.select(date3, RangeSelectType.START_DATE);
+    expect(select.value.start).toBe(date3);
+    expect(select.value.end).toBe(undefined);
   })
 
+  it('should always select end date', () => {
+    const date1 = generateDay();
+    const date2 = generateDay();
+    const date3 = generateDay();
 
-  it('should replace start date when new date is before', () => {
-    const start = generateDay(1);
-    const end = generateDay(5);
+    select.select(date1, RangeSelectType.END_DATE);
+    expect(select.value.start).toBe(undefined);
+    expect(select.value.end).toBe(date1);
 
-    const start2 = generateDay(0);
+    select.select(date2, RangeSelectType.END_DATE);
+    expect(select.value.start).toBe(undefined);
+    expect(select.value.end).toBe(date2);
 
-    select.select(start);
-    select.select(end);
-
-    select.select(start2);
-
-    expect(select.value.start).toBe(start2);
-    expect(select.value.end).toBe(end);
+    select.select(date3, RangeSelectType.END_DATE);
+    expect(select.value.start).toBe(undefined);
+    expect(select.value.end).toBe(date3);
   })
 
-  it('should replace end date when new date is after', () => {
-    const start = generateDay(1);
-    const end = generateDay(5);
+  describe('default select strategy', () => {
+    it('should select both date where they\'re both null', () => {
+      const start = generateDay(1);
+      const end = generateDay(5);
 
-    const end2 = generateDay(6);
+      const start2 = generateDay(0);
 
-    select.select(start);
-    select.select(end);
+      select.select(start);
+      select.select(end);
 
-    select.select(end2);
+      select.select(start2);
 
-    expect(select.value.start).toBe(start);
-    expect(select.value.end).toBe(end2);
+      expect(select.value.start).toBe(start2);
+      expect(select.value.end).toBe(end);
+    })
+
+    it('should replace start date when new date is before', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
+
+      const start2 = generateDay(0);
+      select.select(start2);
+
+      expect(select.value.start).toBe(start2);
+      expect(select.value.end).toBe(value.end);
+    })
+
+    it('should replace end date when new date is after', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
+
+      const end2 = generateDay(6);
+      select.select(end2);
+
+      expect(select.value.start).toBe(value.start);
+      expect(select.value.end).toBe(end2);
+    })
+
+    it('should replace closer date (start)', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
+
+      const start2 = generateDay(2);
+      select.select(start2);
+
+      expect(select.value.start).toBe(start2);
+      expect(select.value.end).toBe(value.end);
+    })
+
+    it('should replace closer date (end)', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
+
+      const end2 = generateDay(4);
+      select.select(end2);
+
+      expect(select.value.start).toBe(value.start);
+      expect(select.value.end).toBe(end2);
+    })
+
+    it('should replace end date when diff with both start and end is equal', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
+
+      const end2 = generateDay(3);
+      select.select(end2);
+
+      expect(select.value.start).toBe(value.start);
+      expect(select.value.end).toBe(end2);
+    })
   })
 
-  it('should replace closer date (start)', () => {
-    const start = generateDay(1);
-    const end = generateDay(5);
+  describe('custom select and unselect strategy', () => {
 
-    const start2 = generateDay(2);
+    beforeEach(() => {
+      select.selectStrategy = (range, date) => RangeSelectType.START_DATE;
+      select.unselectStrategy = (range, date) => RangeSelectType.START_DATE;
+    })
 
-    select.select(start);
-    select.select(end);
+    it('should replace start date', () => {
 
-    select.select(start2);
+      const start = generateDay(1);
+      const end = generateDay(5);
 
-    expect(select.value.start).toBe(start2);
-    expect(select.value.end).toBe(end);
-  })
+      const end2 = generateDay(6);
 
-  it('should replace closer date (end)', () => {
-    const start = generateDay(1);
-    const end = generateDay(5);
+      select.setValue({start, end});
+      select.select(end2);
 
-    const end2 = generateDay(4);
+      expect(select.value.start).toBe(end);
+      expect(select.value.end).toBe(end2);
+    })
 
-    select.select(start);
-    select.select(end);
+    it('should unselect only start date', () => {
+      const value = { start: generateDay(1), end: generateDay(5)};
+      select.setValue(value);
 
-    select.select(end2);
+      select.unselect(value.end);
+      expect(select.value).toBe(value);
 
-    expect(select.value.start).toBe(start);
-    expect(select.value.end).toBe(end2);
-  })
-
-  it('should replace start date when diff with both start and end is equal', () => {
-    const start = generateDay(1);
-    const end = generateDay(5);
-
-    const start2 = generateDay(3);
-
-    select.select(start);
-    select.select(end);
-
-    select.select(start2);
-
-    expect(select.value.start).toBe(start2);
-    expect(select.value.end).toBe(end);
-  })
-
-  it('should use custom replace strategy and replace start date', () => {
-    // always replace start date
-    select.detectStrategy = (range, date) => false;
-
-    const start = generateDay(1);
-    const end = generateDay(5);
-
-    const end2 = generateDay(6);
-
-    select.setValue({start, end});
-    select.select(end2);
-
-    expect(select.value.start).toBe(end);
-    expect(select.value.end).toBe(end2);
-  })
+      select.unselect(value.start);
+      expect(select.value.start).toBe(undefined);
+      expect(select.value.end).toBe(value.end);
+    })
+  });
 
   it('should remove start date if it\'s already selected', () => {
     const value = {
