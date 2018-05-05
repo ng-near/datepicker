@@ -25,7 +25,7 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
     super([], dateConstraint);
   }
 
-  public setDate(date: Date, index: number, options?: EmitOptions) {
+  public setDate(date: DayDate, index: number, options?: EmitOptions) {
     if (this.value[index] !== date) {
       this.setValue([
         ...this.value.slice(0, index),
