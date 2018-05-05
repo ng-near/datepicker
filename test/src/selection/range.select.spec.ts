@@ -293,6 +293,86 @@ describe('RangeSelect', () => {
     expect(select.isSelected(generateDay()));
   })
 
+  describe('close range', () => {
+    beforeEach(() => {
+      select.openRange = false;
+      select.setValue({start: generateDay(1), end: generateDay(3)});
+    })
+
+    it('should be in selection if date is between start and end', () => {
+      expect(select.isInSelection(generateDay(2))).toBe(true);
+    })
+
+    it('should be in selection if date is same as start', () => {
+      expect(select.isInSelection(generateDay(1))).toBe(true);
+    })
+
+    it('should be in selection if date is same as end', () => {
+      expect(select.isInSelection(generateDay(3))).toBe(true);
+    })
+
+    it('should not be in selection if date is before start', () => {
+      expect(select.isInSelection(generateDay(0))).toBe(false);
+    })
+
+    it('should not be in selection if date is after end', () => {
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+    })
+
+    it('should not be in selection if one date is null', () => {
+      select.setValue({start: null, end: generateDay(3)});
+      expect(select.isInSelection(generateDay(2))).toBe(false);
+      expect(select.isInSelection(generateDay(3))).toBe(false);
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+
+      select.setValue({start: generateDay(1), end: null});
+      expect(select.isInSelection(generateDay(0))).toBe(false);
+      expect(select.isInSelection(generateDay(1))).toBe(false);
+      expect(select.isInSelection(generateDay(2))).toBe(false);
+    })
+  })
+
+  describe('open range', () => {
+    beforeEach(() => {
+      select.openRange = true;
+      select.setValue({start: generateDay(1), end: generateDay(3)});
+    })
+
+    it('should be in selection if date is between start and end', () => {
+      expect(select.isInSelection(generateDay(2))).toBe(true);
+    })
+
+    it('should be in selection if date is same as start', () => {
+      expect(select.isInSelection(generateDay(1))).toBe(true);
+    })
+
+    it('should be in selection if date is same as end', () => {
+      expect(select.isInSelection(generateDay(3))).toBe(true);
+    })
+
+    it('should not be in selection if date is before start', () => {
+      expect(select.isInSelection(generateDay(0))).toBe(false);
+    })
+
+    it('should not be in selection if date is after end', () => {
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+    })
+
+    it('should be in selection if date is equal or after start and end is null', () => {
+      select.setValue({start: generateDay(1), end: null});
+      expect(select.isInSelection(generateDay(0))).toBe(false);
+      expect(select.isInSelection(generateDay(1))).toBe(true);
+      expect(select.isInSelection(generateDay(2))).toBe(true);
+    })
+
+    it('should be in selection if date is equal or before end and start is null', () => {
+      select.setValue({start: null, end: generateDay(3)});
+      expect(select.isInSelection(generateDay(2))).toBe(true);
+      expect(select.isInSelection(generateDay(3))).toBe(true);
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+    })
+  })
+
   it('should be complete when both date are set', () => {
     const value = {
       start: generateDay(),

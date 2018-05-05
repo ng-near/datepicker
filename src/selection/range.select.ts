@@ -1,4 +1,4 @@
-import { Directive, Input, Optional } from '@angular/core';
+import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 
 import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
@@ -27,7 +27,7 @@ export type DetectStrategyFn = (value: RangeDate, selectedDate: DayDate) => Rang
   selector: '[rangeSelect]',
   providers: selectProviders(RangeSelect)
 })
-export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
+export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> implements OnChanges {
 
   // single function with a select/deselect boolean instead of 2 functions ?
   // is unselectStrategy really useful ?
@@ -47,8 +47,17 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
   @Input()
   unselectStrategy: DetectStrategyFn = (value: RangeDate, unselectedDate: DayDate) => RangeSelectType.BOTH_DATES;
 
+  @Input()
+  openRange = false;
+
   constructor(@Optional() dateConstraint: DateConstraint) {
     super({}, dateConstraint);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ('openRange' in changes) {
+      this.selectionChange.emit(this.value);
+    }
   }
 
   public setValue(range: RangeDate, options?: EmitOptions) {
@@ -68,7 +77,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
    * @param setType
    * @param options
    */
-  private _setDate(predicate: (d: Date | null | undefined) => boolean, date: Date | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
+  private _setDate(predicate: (d: DayDate | null | undefined) => boolean, date: DayDate | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
     if (setType !== RangeSelectType.NONE) {
       let {start, end} = this.value;
 
@@ -89,19 +98,18 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
     return false;
   }
 
-  public setDate(date: Date | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
+  public setDate(date: DayDate | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
     return this._setDate(d => !isSameDay(d, date), date, setType, options);
   }
 
   protected updateValidity() {
-    let start = this.value.start;
-    let end = this.value.end;
+    let { start, end } = this.value;
 
-    if ( start != null && !this.isValid(start) ) {
+    if (start != null && !this.isValid(start)) {
       start = null;
     }
 
-    if ( end != null && !this.isValid(end) ) {
+    if (end != null && !this.isValid(end)) {
       end = null;
     }
 
@@ -131,11 +139,12 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> {
   }
 
   isInSelection(date: DayDate) {
-    let start = this.value.start,
-        end = this.value.end;
-    return start != null && end != null &&
-         date.getTime() >= start.getTime() &&
-         date.getTime() <= end.getTime();
+    const { start, end } = this.value;
+
+    const afterStart = start != null ? date.getTime() >= start.getTime() : this.openRange;
+    const beforeEnd = end != null ? date.getTime() <= end.getTime() : this.openRange;
+
+    return afterStart && beforeEnd;
   }
 
   isComplete() {
