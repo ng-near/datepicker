@@ -5,7 +5,7 @@ import { DateValidatorFn } from '../../src/validator/model';
 
 let i = 0;
 export function generateDay(id = i++) {
-  return new Date(1970, 0, id);
+  return new Date(1970, 0, id + 1);
 }
 
 export class MockConstraint implements DateConstraint, OnDestroy {
