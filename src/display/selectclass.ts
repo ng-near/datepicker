@@ -77,14 +77,14 @@ export class SelectClass implements OnChanges, OnDestroy {
     }
   }
 
-   // validity could have change selection but if so selectionChange will fire
-   // so we don't have to handle it
+  // validity could have changed selection but if so, selectionChange will fire
+  // so we don't have to handle it
   private updateValidity() {
     const state = this.getValidityState();
 
     /* when new state is invalid we always update
      * but when new state is valid we only update if it was previously invalid
-     *   if state was valid, select or inselection we keep it that way.
+     *   if state was valid, selected or in selection we keep it that way.
      */
     if (state === DayState.INVALID || (this.selectState === DayState.INVALID)) {
       this.updateStateClass(state);
