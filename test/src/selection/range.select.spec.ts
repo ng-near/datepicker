@@ -330,6 +330,11 @@ describe('RangeSelect', () => {
       expect(select.isInSelection(generateDay(1))).toBe(false);
       expect(select.isInSelection(generateDay(2))).toBe(false);
     })
+
+    it('should not be in selection if both date are null', () => {
+      select.setValue({start: null, end: null});
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+    })
   })
 
   describe('open range', () => {
@@ -369,6 +374,11 @@ describe('RangeSelect', () => {
       select.setValue({start: null, end: generateDay(3)});
       expect(select.isInSelection(generateDay(2))).toBe(true);
       expect(select.isInSelection(generateDay(3))).toBe(true);
+      expect(select.isInSelection(generateDay(4))).toBe(false);
+    })
+
+    it('should not be in selection if both date are null', () => {
+      select.setValue({start: null, end: null});
       expect(select.isInSelection(generateDay(4))).toBe(false);
     })
   })

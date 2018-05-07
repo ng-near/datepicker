@@ -141,8 +141,8 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> im
   isInSelection(date: DayDate) {
     const { start, end } = this.value;
 
-    const afterStart = start != null ? date.getTime() >= start.getTime() : this.openRange;
-    const beforeEnd = end != null ? date.getTime() <= end.getTime() : this.openRange;
+    const afterStart = start != null ? date.getTime() >= start.getTime() : this.openRange && end != null;
+    const beforeEnd = end != null ? date.getTime() <= end.getTime() : this.openRange && start != null;
 
     return afterStart && beforeEnd;
   }
