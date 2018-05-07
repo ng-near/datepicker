@@ -1,5 +1,3 @@
-import { DefaultIterableDiffer, IterableDiffer, IterableDifferFactory, TrackByFunction } from '@angular/core';
-
 export class DateMonths implements Iterable<Date> {
 
   private months: Date[];
@@ -78,14 +76,5 @@ export class DateMonths implements Iterable<Date> {
     return new DateMonths(...this.months.map( (d, i) =>
       idx === undefined || i === idx ? mapFn(d) : d
     ));
-  }
-}
-
-export class DateMonthsIterableDiffer implements IterableDifferFactory {
-  supports(objects: any): boolean {
-    return objects instanceof DateMonths;
-  }
-  create<V>(trackByFn: TrackByFunction<V> = index => index): IterableDiffer<V> {
-    return new DefaultIterableDiffer<V>(trackByFn);
   }
 }
