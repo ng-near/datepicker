@@ -1,6 +1,6 @@
 import { registerLocaleData, TranslationWidth } from '@angular/common';
 
-import { DayNames, MonthNames, Years } from '../../../src/display/pipes';
+import { DayNames, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
 import { localeFr } from './locale.fr';
 
 // TODO karma error when importing locales from angular
@@ -163,4 +163,74 @@ describe('Years', () => {
       2002, 2001, 2000, 1999, 1998
     ]);
   })
+});
+
+describe('ISO weeks', () => {
+  let pipe: ISOWeeks;
+
+  beforeEach(() => {
+    pipe = new ISOWeeks();
+  })
+
+  it('should work on year starting on Monday', () => {
+    expect(pipe.transform(new Date(2018, 4))).toEqual([
+      18, 19, 20, 21, 22
+    ]);
+  })
+
+  it('should work on year starting on Tuesday', () => {
+    expect(pipe.transform(new Date(2019, 4))).toEqual([
+      18, 19, 20, 21, 22
+    ]);
+  })
+
+  it('should work on year starting on Wednesday', () => {
+    expect(pipe.transform(new Date(2020, 5))).toEqual([
+      23, 24, 25, 26, 27
+    ]);
+  })
+
+  it('should work on year starting on Thursday', () => {
+    expect(pipe.transform(new Date(2026, 7))).toEqual([
+      31, 32, 33, 34, 35, 36
+    ]);
+  })
+
+  it('should work on year starting on Friday', () => {
+    expect(pipe.transform(new Date(2027, 4))).toEqual([
+      17, 18, 19, 20, 21, 22
+    ]);
+  })
+
+  it('should work on year starting on Saturday', () => {
+    expect(pipe.transform(new Date(2028, 4))).toEqual([
+      18, 19, 20, 21, 22
+    ]);
+  })
+
+  it('should work on year starting on Sunday', () => {
+    expect(pipe.transform(new Date(2023, 5))).toEqual([
+      22, 23, 24, 25, 26
+    ]);
+  })
+
+  it('should work on leap year', () => {
+    expect(pipe.transform(new Date(2032, 2))).toEqual([
+      10, 11, 12, 13, 14
+    ]);
+  })
+
+  fit('first week of year should be 52', () => {
+    expect(pipe.transform(new Date(2023, 0))).toEqual([
+      52, 1, 2, 3, 4
+    ]);
+  })
+
+  it('first week of year should be 53', () => {
+    expect(pipe.transform(new Date(2021, 0))).toEqual([
+      53, 1, 2, 3, 4
+    ]);
+  })
+
+  // can we test different timezone ?
 });
