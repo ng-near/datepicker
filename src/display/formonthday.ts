@@ -1,18 +1,8 @@
-import {
-  Directive,
-  EmbeddedViewRef,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  TemplateRef,
-  ViewContainerRef
-} from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, TemplateRef, ViewContainerRef } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { TODAY } from '../today';
+import { Today } from '../utils/today';
 import { DAY_MILLIS, DayDate, isSameDay, newDayDate, newMonthDate, WEEK_MILLIS } from '../utils/utils';
 
 export interface ForMonthDayContext {
@@ -31,8 +21,8 @@ export class ForMonthday implements OnChanges, OnDestroy {
 
   private sub = Subscription.EMPTY;
 
-  constructor (@Inject(TODAY) private today: BehaviorSubject<DayDate>, private template: TemplateRef<ForMonthDayContext>, private viewContainer: ViewContainerRef) {
-    this.sub = today.subscribe(() => { this.updateToday() });
+  constructor (private today: Today, private template: TemplateRef<ForMonthDayContext>, private viewContainer: ViewContainerRef) {
+    this.sub = today.observable.subscribe(d => { this.updateToday(d) });
   }
 
   ngOnChanges() {
@@ -91,7 +81,7 @@ export class ForMonthday implements OnChanges, OnDestroy {
 
   // TODO must be a way to optimize how we compute isToday
   private addDay(index: number, date: DayDate, currentMonth: boolean) {
-    const today = isSameDay(date, this.today.value);
+    const today = isSameDay(date, this.today.date);
 
     const view = <EmbeddedViewRef<ForMonthDayContext>>this.viewContainer.get(index);
     if (view) {
@@ -111,12 +101,12 @@ export class ForMonthday implements OnChanges, OnDestroy {
       this.viewContainer.remove(i);
   }
 
-  private updateToday() {
+  private updateToday(today: Date) {
     const firstDay = <EmbeddedViewRef<ForMonthDayContext>>this.viewContainer.get(0);
     if (firstDay === null)
       return;
 
-    const todayIdx = (this.today.value.getTime() - firstDay.context.$implicit.getTime()) / DAY_MILLIS;
+    const todayIdx = (today.getTime() - firstDay.context.$implicit.getTime()) / DAY_MILLIS;
 
     const todayView = <EmbeddedViewRef<ForMonthDayContext>>this.viewContainer.get(todayIdx);
     if (todayView !== null)
