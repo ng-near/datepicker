@@ -38,6 +38,12 @@ export function isSameMonth(date1: Date | null, date2: Date | null) {
     date1.getFullYear() === date2.getFullYear();
 }
 
+export function isLeapYear(year: number) {
+  // alternative from https://stackoverflow.com/a/19570985/873229
+  // !(year & 3 || !(year % 25) && year & 15)
+  return year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0);
+}
+
 export function convertDate(v: any) {
   if (v instanceof Date) {
     return v;
