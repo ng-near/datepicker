@@ -1,8 +1,6 @@
 import { FormStyle, getLocaleDayNames, getLocaleFirstDayOfWeek, getLocaleMonthNames, TranslationWidth } from '@angular/common';
 import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core';
 
-import { DAY_MILLIS, MonthDate } from '../index';
-
 export interface NameValue {
   name: string;
   value: number;
@@ -96,40 +94,5 @@ export class Years implements PipeTransform {
     years.push(end);
 
     return years;
-  }
-}
-
-@Pipe({
-  name: 'isoWeeks',
-  pure: true,
-})
-export class ISOWeeks implements PipeTransform {
-
-  // from https://stackoverflow.com/a/6117889/873229
-  transform(month: MonthDate) {
-    const yearStart = new Date(Date.UTC(month.getFullYear(), 0));
-
-    const monthStart = new Date(Date.UTC(month.getFullYear(), month.getMonth()));
-    // Make Sunday's day number 7
-    const monthStartDay = monthStart.getUTCDay() || 7;
-
-    // Set to nearest Thursday: current date + 4 - current day number
-    monthStart.setUTCDate(monthStart.getUTCDate() + 4 - monthStartDay);
-
-    const weekStart = Math.ceil(( ( (monthStart.getTime() - yearStart.getTime()) / DAY_MILLIS) + 1) / 7);
-
-    const monthSize = new Date(Date.UTC(month.getFullYear(), month.getMonth() + 1, 0)).getDate();
-    const dayOnFirstWeek = (8 - monthStartDay);
-
-    const weekEnd = weekStart + Math.ceil((monthSize - dayOnFirstWeek) / 7);
-
-    const result = [];
-    for (let i = weekStart; i <= weekEnd; i++) {
-      result.push(i);
-    }
-
-    // TODO replace 0 with last year number of weeks (52/53)
-
-    return result;
   }
 }
