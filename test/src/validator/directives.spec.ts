@@ -44,7 +44,7 @@ describe('DateConstraint', () => {
     changeSpy = spyOn(dateConstraint.constraintChange, 'emit');
   })
 
-  fit('should validate date according to validator', () => {
+  it('should validate date according to validator', () => {
     expect(dateConstraint.validate(new Date())).toBe(null);
   })
 
@@ -52,6 +52,6 @@ describe('DateConstraint', () => {
     validator.toggle();
 
     expect(changeSpy).toHaveBeenCalled();
-    expect(dateConstraint.validate(new Date())).toBe(TOGGLE_VALIDATOR_ERROR);
+    expect(dateConstraint.validate(new Date())).toEqual(TOGGLE_VALIDATOR_ERROR);
   })
 })
