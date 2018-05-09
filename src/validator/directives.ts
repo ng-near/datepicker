@@ -194,7 +194,7 @@ export class DateConstraint implements OnDestroy {
   constraintChange = new EventEmitter<void>();
 
   constructor(validators: DateValidator[]) {
-    this.validate = DateValidators.compose(validators.map(v => v.validateDate));
+    this.validate = DateValidators.compose(validators.map(v => (d: Date) => v.validateDate(d)));
 
     const onChange = () => this.constraintChange.emit();
 
