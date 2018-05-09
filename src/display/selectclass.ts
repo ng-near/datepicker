@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Inject, InjectionToken, Input, OnChanges, OnDestroy, Optional, Renderer2 as Renderer, SimpleChanges } from '@angular/core';
+import { Directive, ElementRef, Inject, InjectionToken, Input, OnChanges, OnDestroy, Optional, Renderer2 as Renderer } from '@angular/core';
 
 import { Subscription } from 'rxjs/Subscription';
 
@@ -6,7 +6,7 @@ import { DatepickerSelect } from '../selection/base.select';
 import { DayDate } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
 
-const enum DayState {
+export const enum DayState {
   INVALID = 'invalid',
   VALID = 'valid',
   IN_SELECTION = 'inSelection',
@@ -60,39 +60,41 @@ export class SelectClass implements OnChanges, OnDestroy {
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges() {
     this.updateFull();
   }
 
   private getSelectionState() {
     return this.select.isSelected(this.day) ? DayState.SELECTED :
       this.select.isInSelection(this.day) ? DayState.IN_SELECTION :
-      null;
+      DayState.VALID;
   }
 
   private updateSelection() {
     if (this.selectState !== DayState.INVALID) {
-      const state = this.getSelectionState() || DayState.VALID;
-      this.updateStateClass(state);
+      this.updateStateClass(this.getSelectionState());
     }
   }
 
-  // validity could have changed selection but if so, selectionChange will fire
-  // so we don't have to handle it
   private updateValidity() {
     const state = this.getValidityState();
 
-    /* when new state is invalid we always update
-     * but when new state is valid we only update if it was previously invalid
+    /* when new state is invalid we always update */
+    if (state === DayState.INVALID) {
+      this.updateStateClass(state);
+    /* when new state is valid we only update if it was previously invalid
      *   if state was valid, selected or in selection we keep it that way.
      */
-    if (state === DayState.INVALID || (this.selectState === DayState.INVALID)) {
-      this.updateStateClass(state);
+    } else if (this.selectState === DayState.INVALID) {
+      this.updateStateClass(this.getSelectionState());
     }
   }
 
-  updateFull() {
-    const newState: DayState = this.getSelectionState() || this.getValidityState();
+  private updateFull() {
+    let newState: DayState = this.getValidityState();
+    if (newState === DayState.VALID) {
+      newState = this.getSelectionState();
+    }
 
     this.updateStateClass(newState);
   }
