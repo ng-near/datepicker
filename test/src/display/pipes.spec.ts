@@ -2,7 +2,7 @@ import { registerLocaleData, TranslationWidth } from '@angular/common';
 
 import * as moment from 'moment';
 
-import { DayNames, getFirstWeek, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
+import { DayNames, ISODays, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
 import { localeFr } from './locale.fr';
 
 // TODO karma error when importing locales from angular
@@ -11,22 +11,6 @@ import { localeFr } from './locale.fr';
 beforeAll(() => {
   registerLocaleData(localeFr);
 })
-
-xdescribe('special', () => {
-  it('should find march week', () => {
-    for (let i = 1900; i < 2500; i++) {
-      let date = new Date(i, 3);
-      let week = getFirstWeek(date);
-      let momentWeek = moment(date).isoWeek();
-      expect(week).toBe(momentWeek);
-
-      if (week !== momentWeek) {
-        console.log(i);
-        break;
-      }
-    }
-  });
-});
 
 describe('DayNames', () => {
   let pipe: DayNames;
@@ -191,156 +175,76 @@ describe('ISO weeks', () => {
     pipe = new ISOWeeks();
   })
 
-  /* day must be a monday */
-  function utcWeeks(year: number, month: number, day: number) {
-    let last = new Date(Date.UTC(year, month, day - 1));
+  it('should return same weeks as moment from 1900 to 4500', () => {
+    for (let i = 1900; i < 4500; i++) {
+      for (let j = 0; j < 12; j++) {
+          const date = new Date(i, j);
 
-    return () => {
-      const result = [];
-      for (let i = 0; i < 7; i++) {
-        result.push(
-          last = new Date(Date.UTC(last.getFullYear(), last.getMonth(), last.getDate() + 1))
-        );
+          const weeks = pipe.transform(date);
+          let month = moment(date);
+
+          const momentWeeks = [];
+          while (month.month() === j) {
+            momentWeeks.push({week: month.isoWeek(), year: month.isoWeekYear()});
+            month.add(7, 'd');
+          }
+
+          const result = expect(weeks).toEqual(momentWeeks);
+          if (!result) return;
       }
-
-      return result;
     }
-  }
+  });
 
-  it('should work on year starting on Monday', () => {
-    const nextWeek = utcWeeks(2018, 3, 30);
+  it('should always return 6 weeks', () => {
+    for (let i = 1900; i < 4500; i++) {
+      for (let j = 0; j < 12; j++) {
+          const date = new Date(i, j);
 
-    expect(pipe.transform(new Date(2018, 4))).toEqual([
-      { week: 18, days: nextWeek() },
-      { week: 19, days: nextWeek() },
-      { week: 20, days: nextWeek() },
-      { week: 21, days: nextWeek() },
-      { week: 22, days: nextWeek() },
-    ]);
+          const weeks = pipe.transform(date, true);
+          let month = moment(date);
+
+          const momentWeeks = [];
+          for (let i = 0; i < 6; i++) {
+            momentWeeks.push({week: month.isoWeek(), year: month.isoWeekYear()});
+            month.add(7, 'd');
+          }
+
+          const result =
+            expect(weeks.length).toBe(6) &&
+            expect(weeks).toEqual(momentWeeks)
+          ;
+
+          if (!result) return;
+      }
+    }
+  });
+});
+
+fdescribe('ISODays', () => {
+  let pipe: ISODays;
+
+  beforeEach(() => {
+    pipe = new ISODays();
   })
 
-  it('should work on year starting on Tuesday', () => {
-    const nextWeek = utcWeeks(2019, 3, 29);
+  it('should return same days of week as moment from 1900 to 4500', () => {
+    // feels too complicated for a test :/
+    for (let year = 1900; year < 4500; year++) {
+      const weeksInYear = moment({year}).isoWeeksInYear();
+      for (let week = 1; week <= weeksInYear; week++) {
+        const days = pipe.transform({year, week});
 
-    expect(pipe.transform(new Date(2019, 4))).toEqual([
-      { week: 18, days: nextWeek() },
-      { week: 19, days: nextWeek() },
-      { week: 20, days: nextWeek() },
-      { week: 21, days: nextWeek() },
-      { week: 22, days: nextWeek() },
-    ]);
-  })
+        const momentDays = [];
+        let momentDay = moment({year}).isoWeek(week).day(1).subtract(1, 'd');
+        for (let i = 0; i < 7; i++) {
+          momentDay.add(1, 'd');
+          momentDays.push( momentDay.toDate() );
+        }
 
-  it('should work on year starting on Wednesday', () => {
-    const nextWeek = utcWeeks(2020, 5, 1);
+        const result = expect(days).toEqual(momentDays);
+        if (!result) return;
+      }
+    }
+  });
 
-    expect(pipe.transform(new Date(2020, 5))).toEqual([
-      { week: 23, days: nextWeek() },
-      { week: 24, days: nextWeek() },
-      { week: 25, days: nextWeek() },
-      { week: 26, days: nextWeek() },
-      { week: 27, days: nextWeek() },
-    ]);
-  })
-
-  it('should work on year starting on Thursday', () => {
-    const nextWeek = utcWeeks(2026, 6, 27);
-
-    expect(pipe.transform(new Date(2026, 7))).toEqual([
-      { week: 31, days: nextWeek() },
-      { week: 32, days: nextWeek() },
-      { week: 33, days: nextWeek() },
-      { week: 34, days: nextWeek() },
-      { week: 35, days: nextWeek() },
-      { week: 36, days: nextWeek() },
-    ]);
-  })
-
-  it('should work on year starting on Friday', () => {
-    const nextWeek = utcWeeks(2027, 3, 26);
-
-    expect(pipe.transform(new Date(2027, 4))).toEqual([
-      { week: 17, days: nextWeek() },
-      { week: 18, days: nextWeek() },
-      { week: 19, days: nextWeek() },
-      { week: 20, days: nextWeek() },
-      { week: 21, days: nextWeek() },
-      { week: 22, days: nextWeek() },
-    ]);
-  })
-
-  it('should work on year starting on Saturday', () => {
-    const nextWeek = utcWeeks(2028, 4, 1);
-
-    expect(pipe.transform(new Date(2028, 4))).toEqual([
-      { week: 18, days: nextWeek() },
-      { week: 19, days: nextWeek() },
-      { week: 20, days: nextWeek() },
-      { week: 21, days: nextWeek() },
-      { week: 22, days: nextWeek() },
-    ]);
-  })
-
-  it('should work on year starting on Sunday', () => {
-    const nextWeek = utcWeeks(2023, 4, 29);
-
-    expect(pipe.transform(new Date(2023, 5))).toEqual([
-      { week: 22, days: nextWeek() },
-      { week: 23, days: nextWeek() },
-      { week: 24, days: nextWeek() },
-      { week: 25, days: nextWeek() },
-      { week: 26, days: nextWeek() },
-    ]);
-  })
-
-  it('should work on leap year', () => {
-    const nextWeek = utcWeeks(2032, 2, 1);
-
-    expect(pipe.transform(new Date(2032, 2))).toEqual([
-      { week: 10, days: nextWeek() },
-      { week: 11, days: nextWeek() },
-      { week: 12, days: nextWeek() },
-      { week: 13, days: nextWeek() },
-      { week: 14, days: nextWeek() },
-    ]);
-  })
-
-  it('first week of year should be 1', () => {
-    const nextWeek = utcWeeks(2019, 11, 30);
-
-    expect(pipe.transform(new Date(2020, 0))).toEqual([
-      { week: 1, days: nextWeek() },
-      { week: 2, days: nextWeek() },
-      { week: 3, days: nextWeek() },
-      { week: 4, days: nextWeek() },
-      { week: 5, days: nextWeek() },
-    ]);
-  })
-
-  it('first week of year should be 52', () => {
-    const nextWeek = utcWeeks(2022, 11, 26);
-
-    expect(pipe.transform(new Date(2023, 0))).toEqual([
-      { week: 52, days: nextWeek() },
-      { week: 1, days: nextWeek() },
-      { week: 2, days: nextWeek() },
-      { week: 3, days: nextWeek() },
-      { week: 4, days: nextWeek() },
-      { week: 5, days: nextWeek() },
-    ]);
-  })
-
-  it('first week of year should be 53', () => {
-    const nextWeek = utcWeeks(2020, 11, 28);
-
-    expect(pipe.transform(new Date(2021, 0))).toEqual([
-      { week: 53, days: nextWeek() },
-      { week: 1, days: nextWeek() },
-      { week: 2, days: nextWeek() },
-      { week: 3, days: nextWeek() },
-      { week: 4, days: nextWeek() },
-    ]);
-  })
-
-  // can we test different timezone ?
 });
