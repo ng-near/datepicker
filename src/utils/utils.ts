@@ -38,6 +38,26 @@ export function isSameMonth(date1: Date | null, date2: Date | null) {
     date1.getFullYear() === date2.getFullYear();
 }
 
+export function isLeapYear(year: number) {
+  // alternative from https://stackoverflow.com/a/19570985/873229
+  // !(year & 3 || !(year % 25) && year & 15)
+  return year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0);
+}
+
+// from https://stackoverflow.com/a/6117889/873229
+export function getIsoWeek(day: DayDate) {
+  const closestThursday = new Date(Date.UTC(day.getFullYear(), day.getMonth()));
+
+  // normalize week days so it start with monday (1) and end with sunday (7), that's how iso week is defined.
+  const month_weekDay = closestThursday.getUTCDay() || 7;
+  // Set to nearest Thursday, the one on the same week as current day
+  closestThursday.setUTCDate(closestThursday.getUTCDate() + 4 - month_weekDay);
+
+  const yearStart = new Date(Date.UTC(closestThursday.getFullYear(), 0, 1));
+
+  return Math.ceil((((closestThursday.getTime() - yearStart.getTime()) / DAY_MILLIS) + 1) / 7);
+}
+
 export function convertDate(v: any) {
   if (v instanceof Date) {
     return v;
