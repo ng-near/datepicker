@@ -99,6 +99,49 @@ export class Years implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'days',
+  pure: true,
+})
+export class Days implements PipeTransform {
+
+  constructor(@Inject(LOCALE_ID) private locale: string) { }
+
+  transform(month: MonthDate, showSixWeeks = false, locale_or_firstDayOfWeek?: string | number) {
+    const firstDayOfWeek = typeof locale_or_firstDayOfWeek === 'number' ?
+      locale_or_firstDayOfWeek :
+      getLocaleFirstDayOfWeek(locale_or_firstDayOfWeek || this.locale)
+    ;
+
+    const lastDayOfWeek = (firstDayOfWeek + 6) % 7;
+
+    const shiftToFirstDayOfWeek = ( (month.getDay() - firstDayOfWeek) + 7) % 7;
+    const start = new Date(month.getFullYear(), month.getMonth(), month.getDate() - shiftToFirstDayOfWeek);
+
+    const result = [];
+    if (showSixWeeks === true) {
+      // just go for 42 days
+      for (let i = 0; i < 42; i++){
+        result.push(new Date(start.getFullYear(), start.getMonth(), start.getDate() + i));
+      }
+    } else {
+      // compute end date and loop until we reach it
+      const end = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+
+      const shiftToLastDayOfWeek = ( (lastDayOfWeek - end.getDay()) + 7) % 7;
+      end.setDate(end.getDate() + shiftToLastDayOfWeek);
+
+      let i = 0;
+      let date: Date;
+      do {
+        result.push(date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i++));
+      } while (date.getTime() < end.getTime())
+    }
+
+    return result;
+  }
+}
+
 export interface ISOWeekOfYear {
   year: number;
   week: number;

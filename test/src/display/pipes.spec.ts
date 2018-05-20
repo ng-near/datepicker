@@ -2,7 +2,8 @@ import { registerLocaleData, TranslationWidth } from '@angular/common';
 
 import * as moment from 'moment';
 
-import { DayNames, ISODays, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
+import { DayNames, Days, ISODays, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
+import { localeArAE } from '../validator/locale.ar-AE';
 import { localeFr } from './locale.fr';
 
 // TODO karma error when importing locales from angular
@@ -10,6 +11,7 @@ import { localeFr } from './locale.fr';
 
 beforeAll(() => {
   registerLocaleData(localeFr);
+  registerLocaleData(localeArAE);
 })
 
 describe('DayNames', () => {
@@ -165,6 +167,116 @@ describe('Years', () => {
       2002, 2001, 2000, 1999, 1998
     ]);
   })
+});
+
+function rangeDate(startDate, nbWeeks) {
+  const days = [];
+
+  for (let i = 0, l = nbWeeks * 7; i < l; i++) {
+    days.push(new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i));
+  }
+
+  return days;
+}
+
+describe('Days', () => {
+
+  it('should work when 1st and last day of month is in the middle of the week', () => {
+    expect(new Days('en-US').transform(new Date(2014, 6)))
+      .toEqual(rangeDate(new Date(2014, 5, 29), 5));
+  });
+
+  it('should work when 1st of month is Sunday', () => {
+    expect(new Days('en-US').transform(new Date(2014, 5)))
+      .toEqual(rangeDate(new Date(2014, 5, 1), 5));
+  });
+
+  it('should work when 1st of month is Saturday', () => {
+    expect(new Days('en-US').transform(new Date(2014, 2)))
+      .toEqual(rangeDate(new Date(2014, 1, 23), 6));
+  });
+
+  it('should work on December with some days on next January', () => {
+    expect(new Days('en-US').transform(new Date(2014, 11)))
+      .toEqual(rangeDate(new Date(2014, 10, 30), 5));
+  });
+
+  it('should work on January with some days on previous December', () => {
+    expect(new Days('en-US').transform(new Date(2014, 0)))
+      .toEqual(rangeDate(new Date(2013, 11, 29), 5));
+  });
+
+  it('should work when last day of month is Saturday', () => {
+    expect(new Days('en-US').transform(new Date(2014, 4)))
+      .toEqual(rangeDate(new Date(2014, 3, 27), 5));
+  });
+
+  it('should work when month has 6 weeks', () => {
+    expect(new Days('en-US').transform(new Date(2014, 7)))
+      .toEqual(rangeDate(new Date(2014, 6, 27), 6));
+  });
+
+  it('should work when month has 4 weeks', () => {
+    expect(new Days('en-US').transform(new Date(2015, 1)))
+      .toEqual(rangeDate(new Date(2015, 1, 1), 4));
+  });
+
+  it('should work whith leap year', () => {
+    expect(new Days('en-US').transform(new Date(2016, 1)))
+      .toEqual(rangeDate(new Date(2016, 0, 31), 5));
+    expect(new Days('en-US').transform(new Date(2016, 6)))
+      .toEqual(rangeDate(new Date(2016, 5, 26), 6));
+  });
+
+  it('should work when DST occurs during the month (need CET/CEST timezone)', () => {
+    expect(new Days('en-US').transform(new Date(2015, 2)))
+      .toEqual(rangeDate(new Date(2015, 2, 1), 5));
+    expect(new Days('en-US').transform(new Date(2015, 9)))
+      .toEqual(rangeDate(new Date(2015, 8, 27), 5));
+  });
+
+  describe('sixWeeks', () => {
+    it('should return 6 weeks when month only has 4', () => {
+      expect(new Days('en-US').transform(new Date(2015, 1), true).length)
+        .toBe(42);
+    });
+
+    it('should return 6 weeks when month only has 5', () => {
+      expect(new Days('en-US').transform(new Date(2015, 2), true).length)
+        .toBe(42);
+    });
+
+    it('should return 6 weeks when month has 6', () => {
+      expect(new Days('en-US').transform(new Date(2015, 7), true).length)
+        .toBe(42);
+    });
+  });
+
+  describe('first day of week', () => {
+    it('should work with different locale where monday is first day of week', () => {
+      expect(new Days('fr-FR').transform(new Date(2014, 6)))
+        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      ;
+    });
+
+    it('should work with different locale where saturday is first day of week', () => {
+      expect(new Days('ar-AE').transform(new Date(2014, 6)))
+        .toEqual(rangeDate(new Date(2014, 5, 28), 5))
+      ;
+    });
+
+    it('should use locale passed in arg over global LOCALE_ID', () => {
+      expect(new Days('en-US').transform(new Date(2014, 6), false, 'fr-FR'))
+        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      ;
+    });
+
+    it('should override locale first day of week with arg', () => {
+      expect(new Days('en-US').transform(new Date(2014, 6), false, 1))
+        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      ;
+    });
+  });
 });
 
 describe('ISO weeks', () => {
