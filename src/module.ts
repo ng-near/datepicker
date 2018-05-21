@@ -1,8 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 
-import { ForMonthOf } from './display/formonth';
-import { ForMonthday } from './display/formonthday';
 import { DayNames, MonthNames, Years } from './display/pipes';
 import { SelectClass } from './display/selectclass';
 import { convertDate } from './index';
@@ -26,9 +24,6 @@ const decl_exports = [
   DayNames,
   MonthNames,
   Years,
-
-  ForMonthOf,
-  ForMonthday,
 
   SelectClass
 ];

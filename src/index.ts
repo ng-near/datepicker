@@ -11,8 +11,6 @@ export { MinDateValidator, MinDateConstraint, MinDate,
   DisabledDatesValidator, DisabledDatesConstraint, DisabledDates,
   NotWeekendDateValidator, NotWeekendDateConstraint, NotWeekendDate,
   DateConstraint } from './validator/directives';
-export { DateNavigator, ForMonthOf } from './display/formonth';
-export { ForMonthday } from './display/formonthday';
 
 export { SimpleForOf } from './utils/simplefor';
 export { DayNames, MonthNames, Years } from './display/pipes';
