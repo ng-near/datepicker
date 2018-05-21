@@ -13,7 +13,8 @@ export { MinDateValidator, MinDateConstraint, MinDate,
   DateConstraint } from './validator/directives';
 
 export { SimpleForOf } from './utils/simplefor';
-export { DayNames, MonthNames, Years } from './display/pipes';
+export { NameValue, DayNames, MonthNames, Years, Days, IsMonth, IsToday } from './display/calendar.pipes';
+export * from './display/iso.pipes';
 
 export { SelectClass, STATE_CLASSES } from './display/selectclass';
 

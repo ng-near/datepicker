@@ -1,7 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 
-import { DayNames, MonthNames, Years } from './display/pipes';
+import { DayNames, Days, IsMonth, IsToday, MonthNames, Years } from './display/calendar.pipes';
+import { ISODays, ISOWeeks } from './display/iso.pipes';
 import { SelectClass } from './display/selectclass';
 import { convertDate } from './index';
 import { MultiSelect } from './selection/multi.select';
@@ -21,11 +22,10 @@ const decl_exports = [
 
   SimpleForOf,
 
-  DayNames,
-  MonthNames,
-  Years,
+  DayNames, MonthNames, Years, Days, IsMonth, IsToday,
+  ISOWeeks, ISODays,
 
-  SelectClass
+  SelectClass,
 ];
 
 export interface DatepickerConfig {
