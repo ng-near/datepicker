@@ -1,7 +1,9 @@
 import { FormStyle, getLocaleDayNames, getLocaleFirstDayOfWeek, getLocaleMonthNames, TranslationWidth } from '@angular/common';
-import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, Inject, LOCALE_ID, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 
-import { getIsoWeek, MonthDate } from '../index';
+import { Subscription } from 'rxjs/Subscription';
+
+import { DayDate, getIsoWeek, isSameDay, MonthDate, Today } from '../index';
 
 export interface NameValue {
   name: string;
@@ -139,6 +141,52 @@ export class Days implements PipeTransform {
     }
 
     return result;
+  }
+}
+
+@Pipe({
+  name: 'isMonth',
+  // memoization would just be a waste here, so make it unpure
+  pure: false,
+})
+export class IsMonth implements PipeTransform {
+  transform(day: DayDate, month: MonthDate) {
+    return day.getMonth() === month.getMonth();
+  }
+}
+
+@Pipe({
+  name: 'isToday',
+  pure: false,
+})
+export class IsToday implements PipeTransform, OnDestroy {
+
+  private sub: Subscription;
+  private today: Date;
+
+  private lastArg: DayDate | undefined;
+  private lastValue: boolean;
+
+  constructor(today: Today, cdr: ChangeDetectorRef) {
+    this.sub = today.observable.subscribe(d => {
+      this.today = d;
+
+      // cancel memoization
+      this.lastArg = undefined;
+      // trigger view update
+      cdr.markForCheck();
+    })
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
+
+  transform(day: DayDate) {
+    if (day === this.lastArg) return this.lastValue;
+
+    this.lastArg = day;
+    return this.lastValue = isSameDay(day, this.today);
   }
 }
 

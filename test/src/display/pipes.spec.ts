@@ -1,10 +1,16 @@
 import { registerLocaleData, TranslationWidth } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
+
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as moment from 'moment';
 
-import { DayNames, Days, ISODays, ISOWeeks, MonthNames, Years } from '../../../src/display/pipes';
+import { DayNames, Days, IsMonth, ISODays, ISOWeeks, IsToday, MonthNames, Years } from '../../../src/display/pipes';
+import { Today } from '../../../src/utils/today';
 import { localeArAE } from '../validator/locale.ar-AE';
 import { localeFr } from './locale.fr';
+
+
 
 // TODO karma error when importing locales from angular
 // import localeFr from '@angular/common/locales/fr';
@@ -278,6 +284,79 @@ describe('Days', () => {
     });
   });
 });
+
+describe('IsMonth', () => {
+  let pipe: IsMonth;
+
+  beforeEach(() => {
+    pipe = new IsMonth();
+  })
+
+  it('should return true when both date have same month', () => {
+      expect(pipe.transform(new Date(2014, 4, 15), new Date(2014, 4))).toBe(true);
+  })
+
+  it('should return false when dates have different month', () => {
+      expect(pipe.transform(new Date(2014, 4, 15), new Date(2014, 3))).toBe(false);
+      expect(pipe.transform(new Date(2014, 4, 15), new Date(2014, 5))).toBe(false);
+  })
+})
+
+describe('IsToday', () => {
+  let pipe: IsToday;
+  let todaySubject: BehaviorSubject<Date>;
+  let markForCheckSpy: jasmine.Spy;
+
+  beforeEach(() => {
+    todaySubject = new BehaviorSubject(new Date(2015, 5, 25));
+
+    const today = {
+      date: null,
+      observable: todaySubject
+    } as Today;
+    const changeDetectorRef = {
+      markForCheck() { }
+    } as ChangeDetectorRef;
+
+    markForCheckSpy = spyOn(changeDetectorRef, 'markForCheck');
+
+    pipe = new IsToday(today, changeDetectorRef);
+  })
+
+  it('should return true if date is same day as today', () => {
+    expect(pipe.transform(new Date(2015, 5, 25))).toBe(true);
+  })
+
+  it('should return false if date is same day as today', () => {
+    expect(pipe.transform(new Date(2015, 5, 24))).toBe(false);
+  })
+
+  // be sure memoization didn't create some weirdeness
+  it('should keep returning same value over and over if input date is the same date', () => {
+    const todayDate = new Date(2015, 5, 25);
+    const notTodayDate = new Date(2015, 5, 24);
+
+    expect(pipe.transform(todayDate)).toBe(true);
+    expect(pipe.transform(todayDate)).toBe(true);
+    expect(pipe.transform(todayDate)).toBe(true);
+
+    expect(pipe.transform(notTodayDate)).toBe(false);
+    expect(pipe.transform(notTodayDate)).toBe(false);
+    expect(pipe.transform(notTodayDate)).toBe(false);
+  })
+
+  it('should trigger a view update and refresh value when today changes', () => {
+    const todayDate = new Date(2015, 5, 25);
+
+    expect(pipe.transform(todayDate)).toBe(true);
+
+    todaySubject.next(new Date(2015, 5, 26));
+
+    expect(markForCheckSpy).toHaveBeenCalled();
+    expect(pipe.transform(todayDate)).toBe(false);
+  })
+
+})
 
 describe('ISO weeks', () => {
   let pipe: ISOWeeks;
