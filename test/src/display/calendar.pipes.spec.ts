@@ -3,10 +3,10 @@ import { ChangeDetectorRef } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { DayNames, Days, IsMonth, IsToday, MonthNames, Years } from '../../../src/display/pipes';
+import { DayNames, Days, IsMonth, IsToday, MonthNames, Years } from '../../../src/display/calendar.pipes';
 import { Today } from '../../../src/utils/today';
-import { localeArAE } from '../validator/locale.ar-AE';
-import { localeFr } from './locale.fr';
+import { localeArAE } from '../locales/locale.ar-AE';
+import { localeFr } from '../locales/locale.fr';
 
 
 

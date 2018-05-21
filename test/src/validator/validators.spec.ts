@@ -1,9 +1,9 @@
-
 import { registerLocaleData } from '@angular/common';
 
 import { DateValidatorFn } from '../../../src/validator/model';
 import { DateValidators } from '../../../src/validator/validators';
-import { localeArAE } from './locale.ar-AE';
+import { localeArAE } from '../locales/locale.ar-AE';
+
 
 describe('Constraints', () => {
   describe('minDate', () => {
