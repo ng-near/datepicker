@@ -46,12 +46,12 @@ export function isLeapYear(year: number) {
 
 // from https://stackoverflow.com/a/6117889/873229
 export function getIsoWeek(day: DayDate) {
-  const closestThursday = new Date(Date.UTC(day.getFullYear(), day.getMonth()));
+  const closestThursday = new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate()));
 
   // normalize week days so it start with monday (1) and end with sunday (7), that's how iso week is defined.
-  const month_weekDay = closestThursday.getUTCDay() || 7;
+  const weekDay = closestThursday.getUTCDay() || 7;
   // Set to nearest Thursday, the one on the same week as current day
-  closestThursday.setUTCDate(closestThursday.getUTCDate() + 4 - month_weekDay);
+  closestThursday.setUTCDate(closestThursday.getUTCDate() + 4 - weekDay);
 
   const yearStart = new Date(Date.UTC(closestThursday.getFullYear(), 0, 1));
 
