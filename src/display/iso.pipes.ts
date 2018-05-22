@@ -57,15 +57,20 @@ export class ISODays implements PipeTransform {
     transform(isoWeek: ISOWeekOfYear) {
         const { year } = isoWeek;
 
-        const firstDay = new Date(year, 0).getDate() || 7;
+        const firstDayOfWeek = new Date(year, 0).getDay();
 
-        const shiftToFirstMonday = -(firstDay - 1);
+        /* original formula : (4 - firstDay) + 7 % 7
+            - +7 cause js doesn't handle negative numbers on modulo
+        */
+        const shiftToFirstThursday = (11 - firstDayOfWeek) % 7;
         const shiftToWeek = (isoWeek.week - 1) * 7;
-        const shiftToStartWeek = shiftToFirstMonday + shiftToWeek;
+        // 1 for Jan 1 + how many days to be on first Thursday of year + how many days to get on requested week number
+        const shiftToThursdayOnWeek = 1 + shiftToFirstThursday + shiftToWeek;
 
         const result = [];
-        for (let i = 1; i < 8; i++) {
-            result.push(new Date(year, 0, shiftToStartWeek + i));
+        // we shift to thursday so the week is from 3 days before (monday) to 3 days after (sunday)
+        for (let i = -3; i < 4; i++) {
+            result.push(new Date(year, 0, shiftToThursdayOnWeek + i));
         }
 
         return result;
