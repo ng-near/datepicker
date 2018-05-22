@@ -1,27 +1,28 @@
-import { CommonModule, FormStyle, getLocaleDayNames, TranslationWidth } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, Input, LOCALE_ID, NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Input, NgModule } from '@angular/core';
 
+import { DateMonths } from '../../index';
 import { DatepickerModule } from '../../module';
 import { ensureMonthDate } from '../../utils/utils';
 
 @Component({
   selector: 'simple-datepicker',
   template: `
-    <div class="month" *forMonth="let month of months; first as first; last as last; selector as selector; navigator as navigator">
+    <div class="month" *staticFor="let month of months; index as i">
       <div class="header">
-        <button *ngIf="first" (click)="months = navigator.moveMonth(-1)">&lt;</button>
+        <button *ngIf="index === 0" (click)="months = months.shiftMonth(-1)">&lt;</button>
         <span>{{ month | date: 'MMMM y' }}</span>
-        <button *ngIf="last" (click)="months = navigator.moveMonth(1)">&gt;</button>
+        <button *ngIf="index === months.size - 1" (click)="months = months.shiftMonth(1)">&gt;</button>
       </div>
       <div class="weekNames">
-        <span *ngFor="let wd of dayNames">{{ wd }}</span>
+        <span *staticFor="let wd of 'short' | dayNames">{{ wd }}</span>
       </div>
       <div class="days">
-        <span *forMonthday="let d of month; sixWeeks: true; today as today; currentMonth as currMonth"
+        <span *simpleFor="let d of month | days: true"
               (mousedown)="selector.selectDate(d)"
               [selectClass]="d"
-              [class.isToday]="today"
-              [class.currMonth]="currMonth">
+              [class.isToday]="d | isToday"
+              [class.currMonth]="d | isMonth: month">
           {{ d.getDate() }}
         </span>
       </div>
@@ -60,13 +61,7 @@ import { ensureMonthDate } from '../../utils/utils';
 })
 export class SimpleDatepicker {
 
-  dayNames: string[];
-
-  @Input() months: Date[] = [ensureMonthDate()];
-
-  constructor(@Inject(LOCALE_ID) private locale: string) {
-    this.dayNames = getLocaleDayNames(locale, FormStyle.Standalone, TranslationWidth.Narrow)
-  }
+  @Input() months = new DateMonths(ensureMonthDate());
 
 }
 
