@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Inject, LOCALE_ID, OnDestroy, Pipe, PipeTransform } 
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { DayDate, isSameDay, MonthDate, Today } from '../index';
+import { DayDate, isSameDay, isSameMonth, MonthDate, Today } from '../index';
 
 export interface NameValue {
   name: string;
@@ -146,12 +146,11 @@ export class Days implements PipeTransform {
 
 @Pipe({
   name: 'isMonth',
-  // memoization would just be a waste here, so make it unpure
-  pure: false,
+  pure: true,
 })
 export class IsMonth implements PipeTransform {
   transform(day: DayDate, month: MonthDate) {
-    return day.getMonth() === month.getMonth();
+    return isSameMonth(day, month);
   }
 }
 
