@@ -6,17 +6,17 @@ export interface ImplicitContext<T> {
 }
 
 @Directive({
-  selector: '[simpleFor], [simpleForOf]',
+  selector: '[staticFor], [staticForOf]',
 })
-export class SimpleForOf<T> implements OnChanges {
+export class StaticForOf<T> implements OnChanges {
 
   @Input()
-  simpleForOf: Iterable<T>;
+  staticForOf: Iterable<T>;
 
   constructor(private viewContainer: ViewContainerRef, private template: TemplateRef<ImplicitContext<T>>) { }
 
   ngOnChanges() {
-    const items = this.simpleForOf;
+    const items = this.staticForOf;
 
     const length = this.viewContainer.length;
 

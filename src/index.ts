@@ -12,7 +12,7 @@ export { MinDateValidator, MinDateConstraint, MinDate,
   NotWeekendDateValidator, NotWeekendDateConstraint, NotWeekendDate,
   DateConstraint } from './validator/directives';
 
-export { SimpleForOf } from './utils/simplefor';
+export { StaticForOf } from './utils/staticfor';
 export { NameValue, DayNames, MonthNames, Years, Days, IsMonth, IsToday } from './display/calendar.pipes';
 export * from './display/iso.pipes';
 

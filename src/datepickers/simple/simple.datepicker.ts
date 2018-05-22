@@ -2,7 +2,7 @@ import { CommonModule, FormStyle, getLocaleDayNames, TranslationWidth } from '@a
 import { ChangeDetectionStrategy, Component, Inject, Input, LOCALE_ID, NgModule } from '@angular/core';
 
 import { DatepickerModule } from '../../module';
-import { newMonthDate } from '../../utils/utils';
+import { ensureMonthDate } from '../../utils/utils';
 
 @Component({
   selector: 'simple-datepicker',
@@ -62,7 +62,7 @@ export class SimpleDatepicker {
 
   dayNames: string[];
 
-  @Input() months: Date[] = [newMonthDate()];
+  @Input() months: Date[] = [ensureMonthDate()];
 
   constructor(@Inject(LOCALE_ID) private locale: string) {
     this.dayNames = getLocaleDayNames(locale, FormStyle.Standalone, TranslationWidth.Narrow)

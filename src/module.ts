@@ -8,7 +8,7 @@ import { convertDate } from './index';
 import { MultiSelect } from './selection/multi.select';
 import { RangeSelect } from './selection/range.select';
 import { SingleSelect } from './selection/single.select';
-import { SimpleForOf } from './utils/simplefor';
+import { StaticForOf } from './utils/staticfor';
 import { Today } from './utils/today';
 import { VALIDATOR_DIRECTIVES } from './validator/directives';
 import { DATE_CONVERTER } from './validator/model';
@@ -20,7 +20,7 @@ const decl_exports = [
 
   ...VALIDATOR_DIRECTIVES,
 
-  SimpleForOf,
+  StaticForOf,
 
   DayNames, MonthNames, Years, Days, IsMonth, IsToday,
   ISOWeeks, ISODays,

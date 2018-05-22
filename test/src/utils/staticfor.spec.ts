@@ -1,12 +1,12 @@
 import { Component, DebugElement } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SimpleForOf } from '../../../src/utils/simplefor';
+import { StaticForOf } from '../../../src/utils/staticfor';
 
 @Component({
   selector: 'test-cmp',
   template: `
-    <span *simpleFor="let item of items">{{item}}</span>
+    <span *staticFor="let item of items">{{item}}</span>
   `
 })
 // @ts-ignore
@@ -30,7 +30,7 @@ describe('SimpleForOf', () => {
 
   beforeEach(async(() =>
     TestBed.configureTestingModule({
-      declarations: [TestComponent, SimpleForOf],
+      declarations: [TestComponent, StaticForOf],
     })
   ))
 
