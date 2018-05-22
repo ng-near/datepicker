@@ -5,17 +5,17 @@ import { defer } from 'rxjs/observable/defer';
 import { timer } from 'rxjs/observable/timer';
 import { map, shareReplay, startWith } from 'rxjs/operators';
 
-import { DAY_MILLIS, newDayDate } from './utils';
-
+import { DAY_MILLIS, ensureDayDate } from './utils';
 
 @Injectable()
 export class Today {
   // TODO how do we test that ?
   observable: Observable<Date> = defer(() => {
-    const now = newDayDate();
+    const now = new Date();
+
     return timer(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), DAY_MILLIS)
       .pipe(
-        map(() => newDayDate()),
+        map(() => ensureDayDate()),
         startWith(now),
       )
   }).pipe(
@@ -23,7 +23,7 @@ export class Today {
   )
 
   get date() {
-    return newDayDate();
+    return ensureDayDate();
   }
 }
 

@@ -24,12 +24,6 @@ describe('Constraints', () => {
     it('should validate same date', () => {
       expect(minDate(new Date(2000, 0, 1))).toBe(null);
     })
-
-    it('should normalize minDate to a day (with time set to 0)', () => {
-      minDate = DateValidators.minDate(new Date(2000, 0, 1, 10, 20));
-
-      expect(minDate(new Date(2000, 0, 1))).toBe(null);
-    })
   })
 
   describe('maxDate', () => {
@@ -48,12 +42,6 @@ describe('Constraints', () => {
     })
 
     it('should validate same date', () => {
-      expect(maxDate(new Date(2000, 0, 1))).toBe(null);
-    })
-
-    it('should normalize maxDate to a day (with time set to 0)', () => {
-      maxDate = DateValidators.maxDate(new Date(2000, 0, 1, 10, 20));
-
       expect(maxDate(new Date(2000, 0, 1))).toBe(null);
     })
   })

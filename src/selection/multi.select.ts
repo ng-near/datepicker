@@ -1,6 +1,6 @@
 import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/core';
 
-import { DayDate, isSameDay, newDayDate } from '../utils/utils';
+import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
 import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
@@ -29,7 +29,7 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
     if (this.value[index] !== date) {
       this.setValue([
         ...this.value.slice(0, index),
-        newDayDate(date.getTime()),
+        date,
         ...this.value.slice(index + 1),
       ], options);
     }

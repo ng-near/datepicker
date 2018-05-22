@@ -3,18 +3,18 @@ export type MonthDate = Date;
 
 export const DAY_MILLIS = 8.64e+7;
 
-export function newDayDate(millis?: number): DayDate {
-  const date = millis ? new Date(millis) : new Date();
-  date.setHours(0, 0, 0, 0);
+export function ensureDayDate(date?: Date): DayDate {
+  const copy = date === undefined ? new Date() : new Date(date.getTime());
+  copy.setHours(0, 0, 0, 0);
 
-  return date;
+  return copy;
 }
 
-export function newMonthDate(millis?: number): MonthDate {
-  let date = newDayDate(millis);
-  date.setDate(1);
+export function ensureMonthDate(date?: Date): MonthDate {
+  const result = ensureDayDate(date);
+  result.setDate(1);
 
-  return date;
+  return result;
 }
 
 export function isSameDay(date1: Date | null | undefined, date2: Date | null | undefined) {

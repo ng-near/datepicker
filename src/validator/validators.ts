@@ -1,26 +1,23 @@
 import { getLocaleWeekEndRange } from '@angular/common';
 
-import { isSameDay, newDayDate } from '../utils/utils';
+import { DayDate } from '../index';
+import { isSameDay } from '../utils/utils';
 import { DateValidatorFn } from './model';
 
 export namespace DateValidators {
-  export function minDate(_minDate: Date): DateValidatorFn {
-    const minTime = newDayDate(_minDate.getTime()).getTime();
-
-    return date => date.getTime() < minTime ? {
+  export function minDate(minDate: DayDate): DateValidatorFn {
+    return date => date.getFullYear() < minDate.getFullYear() || date.getMonth() < minDate.getMonth() || date.getDate() < minDate.getDate() ? {
       minDate: true
     } : null;
   };
 
-  export function maxDate(_maxDate: Date): DateValidatorFn {
-    const maxTime = newDayDate(_maxDate.getTime()).getTime();
-
-    return date => date.getTime() > maxTime ? {
+  export function maxDate(maxDate: DayDate): DateValidatorFn {
+    return date => date.getFullYear() > maxDate.getFullYear() || date.getMonth() > maxDate.getMonth() || date.getDate() > maxDate.getDate() ? {
       maxDate: true
     } : null;
   }
 
-  export function disabledDates(disabled: Date[]): DateValidatorFn {
+  export function disabledDates(disabled: DayDate[]): DateValidatorFn {
     return date => disabled.some(d => isSameDay(date, d)) ? {
       disabledDates: true
     } : null;
