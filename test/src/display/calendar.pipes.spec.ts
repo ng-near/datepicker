@@ -8,8 +8,6 @@ import { Today } from '../../../src/utils/today';
 import { localeArAE } from '../locales/locale.ar-AE';
 import { localeFr } from '../locales/locale.fr';
 
-
-
 // TODO karma error when importing locales from angular
 // import localeFr from '@angular/common/locales/fr';
 
@@ -241,12 +239,12 @@ describe('Days', () => {
 
   describe('sixWeeks', () => {
     it('should return 6 weeks when month only has 4', () => {
-      expect(new Days('en-US').transform(new Date(2015, 1), true).length)
+      expect(new Days('en-US').transform(new Date(2021, 1), true).length)
         .toBe(42);
     });
 
     it('should return 6 weeks when month only has 5', () => {
-      expect(new Days('en-US').transform(new Date(2015, 2), true).length)
+      expect(new Days('en-US').transform(new Date(2021, 2), true).length)
         .toBe(42);
     });
 
@@ -258,26 +256,26 @@ describe('Days', () => {
 
   describe('first day of week', () => {
     it('should work with different locale where monday is first day of week', () => {
-      expect(new Days('fr-FR').transform(new Date(2014, 6)))
-        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      expect(new Days('fr-FR').transform(new Date(2018, 8)))
+        .toEqual(rangeDate(new Date(2018, 7, 27), 5))
       ;
     });
 
     it('should work with different locale where saturday is first day of week', () => {
-      expect(new Days('ar-AE').transform(new Date(2014, 6)))
-        .toEqual(rangeDate(new Date(2014, 5, 28), 5))
+      expect(new Days('ar-AE').transform(new Date(2018, 7)))
+        .toEqual(rangeDate(new Date(2018, 6, 28), 5))
       ;
     });
 
     it('should use locale passed in arg over global LOCALE_ID', () => {
-      expect(new Days('en-US').transform(new Date(2014, 6), false, 'fr-FR'))
-        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      expect(new Days('en-US').transform(new Date(2019, 5), false, 'fr-FR'))
+        .toEqual(rangeDate(new Date(2019, 4, 27), 5))
       ;
     });
 
     it('should override locale first day of week with arg', () => {
-      expect(new Days('en-US').transform(new Date(2014, 6), false, 1))
-        .toEqual(rangeDate(new Date(2014, 5, 30), 5))
+      expect(new Days('en-US').transform(new Date(2019, 10), false, 2))
+        .toEqual(rangeDate(new Date(2019, 9, 29), 5))
       ;
     });
   });
@@ -298,6 +296,10 @@ describe('IsMonth', () => {
       expect(pipe.transform(new Date(2014, 4, 15), new Date(2014, 3))).toBe(false);
       expect(pipe.transform(new Date(2014, 4, 15), new Date(2014, 5))).toBe(false);
   })
+
+  it('should return false when dates have different year', () => {
+    expect(pipe.transform(new Date(2014, 4, 15), new Date(2015, 4))).toBe(false);
+})
 })
 
 describe('IsToday', () => {

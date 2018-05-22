@@ -17,6 +17,12 @@ export function ensureMonthDate(date?: Date): MonthDate {
   return result;
 }
 
+/* isSameDay and isSameMonth have slightly different behavior when it comes to null/undefined
+ *  - weirdeness comes from isSameDay that returns true when both date are null or undefined
+ * We keep it that way because that's what we need inside selectors and that utility function
+ * primarly usage is for those selectors.
+ */
+
 export function isSameDay(date1: Date | null | undefined, date2: Date | null | undefined) {
   return date1 === date2 || (
     date1 != null && date2 != null &&
@@ -26,7 +32,10 @@ export function isSameDay(date1: Date | null | undefined, date2: Date | null | u
   );
 }
 
-export function isSameMonth(date1: Date | null, date2: Date | null) {
+/* We don't test `date1 === date2` because it would complicate the function and both date being same ref
+ * is not likely to happen in the usage of that function (as opposed to isDameDay()).
+ */
+export function isSameMonth(date1: Date | null | undefined, date2: Date | null | undefined) {
   return date1 != null && date2 != null &&
     date1.getMonth() === date2.getMonth() &&
     date1.getFullYear() === date2.getFullYear();
@@ -46,20 +55,28 @@ export function getIsoWeek(day: DayDate) {
   return Math.ceil((((closestThursday.getTime() - yearStart.getTime()) / DAY_MILLIS) + 1) / 7);
 }
 
-export function convertDate(v: any) {
+export type DateObject = {
+  year: number;
+  month: number;
+} & ({ date: number } | { day: number});
+
+function isDateObject(v: any): v is DateObject {
+  return typeof v === 'object' && v.year != null && v.month != null && (v.day != null || v.date != null);
+}
+
+export function convertDate(v: Date | DateObject | string | number | any) {
+  if (v == null) {
+    return new Date(NaN);
+  }
+
   if (v instanceof Date) {
     return v;
   }
 
-  if (typeof v === 'object' && v.year != null && v.month != null) {
-    return new Date(v.year, v.month, v.day || v.date, v.hours, v.minutes, v.seconds, v.milliseconds);
+  if (isDateObject(v)) {
+    return new Date(v.year, v.month, (<any>v).day || (<any>v).date);
   }
 
-  const time = Date.parse(v);
-
-  if (Number.isNaN(time)) {
-    return null;
-  }
-
-  return new Date(time);
+  // TODO see why ts complains
+  return new Date(<any>v);
 }
