@@ -3,7 +3,8 @@ import { ChangeDetectorRef, Inject, LOCALE_ID, OnDestroy, Pipe, PipeTransform } 
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { DayDate, isSameDay, isSameMonth, MonthDate, Today } from '../index';
+import { Today } from '../utils/today';
+import { DayDate, isSameDay, isSameMonth, MonthDate } from '../utils/utils';
 
 export interface NameValue {
   name: string;

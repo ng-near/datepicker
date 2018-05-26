@@ -2,21 +2,21 @@ import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/c
 
 import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
-import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
+import { DatePicker, EmitOptions, pickerProviders } from './base';
 
 export interface RangeDate {
   start?: DayDate | null | undefined;
   end?: DayDate | null | undefined;
 }
 
-export const enum RangeSelectType {
+export const enum RangePickerType {
   NONE = 0,
   START_DATE = 1,
   END_DATE = 2,
   BOTH_DATES = START_DATE | END_DATE,
 }
 
-export type DetectStrategyFn = (value: RangeDate, selectedDate: DayDate) => RangeSelectType;
+export type DetectStrategyFn = (value: RangeDate, pickedDate: DayDate) => RangePickerType;
 
 /**
  * TODO docs
@@ -24,29 +24,29 @@ export type DetectStrategyFn = (value: RangeDate, selectedDate: DayDate) => Rang
  */
 
 @Directive({
-  selector: '[rangeSelect]',
-  exportAs: 'selector, rangeSelect',
-  providers: selectProviders(RangeSelect)
+  selector: '[rangePicker]',
+  exportAs: 'picker, rangePicker',
+  providers: pickerProviders(RangePicker)
 })
-export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> implements OnChanges {
+export class RangePicker extends DatePicker<RangeDate, RangePickerType> implements OnChanges {
 
-  // single function with a select/deselect boolean instead of 2 functions ?
-  // is unselectStrategy really useful ?
+  // single function with a pick/unpick boolean instead of 2 functions ?
+  // is unpickStrategy really useful ?
   // Allow string for most common strategy ?
   @Input()
-  selectStrategy: DetectStrategyFn = ({start, end}, date) => {
+  pickStrategy: DetectStrategyFn = ({start, end}, date) => {
     if (start == null && end == null) {
-      return RangeSelectType.BOTH_DATES;
+      return RangePickerType.BOTH_DATES;
     }
 
     return start == null || (end != null && Math.abs(date.getTime() - start.getTime()) < Math.abs(date.getTime() - end.getTime())) ?
-        RangeSelectType.START_DATE :
-        RangeSelectType.END_DATE
+      RangePickerType.START_DATE :
+      RangePickerType.END_DATE
     ;
   };
 
   @Input()
-  unselectStrategy: DetectStrategyFn = (value: RangeDate, unselectedDate: DayDate) => RangeSelectType.BOTH_DATES;
+  unpickStrategy: DetectStrategyFn = (value: RangeDate, unpickedDate: DayDate) => RangePickerType.BOTH_DATES;
 
   @Input()
   openRange = false;
@@ -57,7 +57,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> im
 
   ngOnChanges(changes: SimpleChanges) {
     if ('openRange' in changes) {
-      this.selectionChange.emit(this.value);
+      this.pickChange.emit(this.value);
     }
   }
 
@@ -78,15 +78,15 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> im
    * @param setType
    * @param options
    */
-  private _setDate(predicate: (d: DayDate | null | undefined) => boolean, date: DayDate | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
-    if (setType !== RangeSelectType.NONE) {
+  private _setDate(predicate: (d: DayDate | null | undefined) => boolean, date: DayDate | null | undefined, setType: RangePickerType, options?: EmitOptions) {
+    if (setType !== RangePickerType.NONE) {
       let {start, end} = this.value;
 
-      if ((setType & RangeSelectType.START_DATE) > 0 && predicate(start)) {
+      if ((setType & RangePickerType.START_DATE) > 0 && predicate(start)) {
         start = date;
       }
 
-      if ((setType & RangeSelectType.END_DATE) > 0 && predicate(end)) {
+      if ((setType & RangePickerType.END_DATE) > 0 && predicate(end)) {
         end = date;
       }
 
@@ -99,7 +99,7 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> im
     return false;
   }
 
-  public setDate(date: DayDate | null | undefined, setType: RangeSelectType, options?: EmitOptions) {
+  public setDate(date: DayDate | null | undefined, setType: RangePickerType, options?: EmitOptions) {
     return this._setDate(d => !isSameDay(d, date), date, setType, options);
   }
 
@@ -120,26 +120,26 @@ export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> im
   }
 
   /* alias function for easy use inside template (no enum ref)*/
-  selectStartDate(date: DayDate) {
-    return this.select(date, RangeSelectType.START_DATE);
+  pickStartDate(date: DayDate) {
+    return this.pick(date, RangePickerType.START_DATE);
   }
-  selectEndDate(date: DayDate) {
-    return this.select(date, RangeSelectType.END_DATE);
-  }
-
-  protected add(date: DayDate, selectType = this.selectStrategy(this.value, date)) {
-    return this.setDate(date, selectType);
+  pickEndDate(date: DayDate) {
+    return this.pick(date, RangePickerType.END_DATE);
   }
 
-  protected remove(date: DayDate, deselectType = this.unselectStrategy(this.value, date)) {
-    return this._setDate(d => isSameDay(d, date), undefined, deselectType);
+  protected add(date: DayDate, pickType = this.pickStrategy(this.value, date)) {
+    return this.setDate(date, pickType);
   }
 
-  isSelected(date: DayDate) {
+  protected remove(date: DayDate, unpickType = this.unpickStrategy(this.value, date)) {
+    return this._setDate(d => isSameDay(d, date), undefined, unpickType);
+  }
+
+  isPicked(date: DayDate) {
     return isSameDay(date, this.value.start) || isSameDay(date, this.value.end);
   }
 
-  isInSelection(date: DayDate) {
+  isInPick(date: DayDate) {
     const { start, end } = this.value;
 
     const afterStart = start != null ? date.getTime() >= start.getTime() : this.openRange && end != null;

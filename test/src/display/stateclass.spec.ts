@@ -1,49 +1,49 @@
 import { EventEmitter, Renderer2, RendererStyleFlags2 } from '@angular/core';
 
-import { DayState, SelectClass, StateClassesName } from '../../../src/display/selectclass';
-import { DatepickerSelect, EmitOptions } from '../../../src/selection/base.select';
+import { DayState, StateClass, StateClassesName } from '../../../src/display/stateclass';
+import { DatePicker, EmitOptions } from '../../../src/pickers/base';
 import { DateConstraint } from '../../../src/validator/directives';
 
 import '../matchers';
 
-describe('SelectClass -', () => {
+describe('StateClass -', () => {
   let constraint: MockConstraint;
-  let select: MockSelect;
+  let picker: MockPicker;
   let renderer: MockRenderer;
-  let selectClass: SelectClass;
+  let stateClass: StateClass;
 
   let validateSpy: jasmine.Spy;
-  let isSelectedSpy: jasmine.Spy;
-  let isInSelectionSpy: jasmine.Spy;
+  let ispickedSpy: jasmine.Spy;
+  let isInPickSpy: jasmine.Spy;
 
   function setupInstances(classes: StateClassesName = null) {
     constraint = new MockConstraint();
-    select = new MockSelect(null, constraint);
+    picker = new MockPicker(null, constraint);
     renderer = new MockRenderer();
-    selectClass = new SelectClass(select, classes, constraint, {nativeElement: null}, renderer);
+    stateClass = new StateClass(picker, classes, constraint, {nativeElement: null}, renderer);
 
     validateSpy = spyOn(constraint, 'validate');
-    isSelectedSpy = spyOn(select, 'isSelected');
-    isInSelectionSpy = spyOn(select, 'isInSelection');
+    ispickedSpy = spyOn(picker, 'isPicked');
+    isInPickSpy = spyOn(picker, 'isInPick');
   }
 
   function expectClassToBe(className: string) {
     expect(renderer.getClasses() as any).toEqual([className]);
   }
 
-  function setSpiesReturnAndUpdate(isValid: boolean, isSelected: boolean, isInSelection: boolean) {
+  function setSpiesReturnAndUpdate(isValid: boolean, ispicked: boolean, isInpickion: boolean) {
     validateSpy.and.returnValue(isValid ? null : {});
-    isSelectedSpy.and.returnValue(isSelected);
-    isInSelectionSpy.and.returnValue(isInSelection);
+    ispickedSpy.and.returnValue(ispicked);
+    isInPickSpy.and.returnValue(isInpickion);
 
-    selectClass.ngOnChanges();
+    stateClass.ngOnChanges();
   }
 
-  function emitSelectionChange(isSelected: boolean, isInSelection: boolean) {
-    isSelectedSpy.and.returnValue(isSelected);
-    isInSelectionSpy.and.returnValue(isInSelection);
+  function emitpickionChange(ispicked: boolean, isInpickion: boolean) {
+    ispickedSpy.and.returnValue(ispicked);
+    isInPickSpy.and.returnValue(isInpickion);
 
-    select.selectionChange.emit();
+    picker.pickChange.emit();
   }
 
   function emitConstraintChange(isValid: boolean) {
@@ -67,7 +67,7 @@ describe('SelectClass -', () => {
       expectClassToBe(DayState.INVALID);
     })
 
-    it('should set class as invalid no matter if it\'s in the selection or not', () => {
+    it('should set class as invalid no matter if it\'s in the pickion or not', () => {
       setSpiesReturnAndUpdate(false, true, false);
       expectClassToBe(DayState.INVALID);
 
@@ -78,26 +78,26 @@ describe('SelectClass -', () => {
       expectClassToBe(DayState.INVALID);
     })
 
-    it('should set class as selected', () => {
+    it('should set class as picked', () => {
       setSpiesReturnAndUpdate(true, true, false);
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
 
       setSpiesReturnAndUpdate(true, true, true);
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
     })
 
-    it('should set class as inselection', () => {
+    it('should set class as inpickion', () => {
       setSpiesReturnAndUpdate(true, false, true);
-      expectClassToBe(DayState.IN_SELECTION);
+      expectClassToBe(DayState.IN_PICK);
     })
 
     it('should update on input change', () => {
       setSpiesReturnAndUpdate(true, false, false);
 
-      isSelectedSpy.and.returnValue(true);
-      selectClass.ngOnChanges();
+      ispickedSpy.and.returnValue(true);
+      stateClass.ngOnChanges();
 
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
     })
 
     it('should update when constraints change', () => {
@@ -108,39 +108,39 @@ describe('SelectClass -', () => {
       expectClassToBe(DayState.INVALID);
     })
 
-    it('should update when selection changes', () => {
+    it('should update when pickion changes', () => {
       setSpiesReturnAndUpdate(true, false, false);
 
-      emitSelectionChange(true, false);
+      emitpickionChange(true, false);
 
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
     })
 
-    it('selection change shouldn\'t affect invalid state', () => {
+    it('pickion change shouldn\'t affect invalid state', () => {
       setSpiesReturnAndUpdate(false, false, false);
 
-      emitSelectionChange(true, false);
+      emitpickionChange(true, false);
 
       expectClassToBe(DayState.INVALID);
     })
 
-    it('should update when constraint then selection changes', () => {
+    it('should update when constraint then pickion changes', () => {
       setSpiesReturnAndUpdate(false, false, false);
 
       emitConstraintChange(true);
-      emitSelectionChange(true, false);
+      emitpickionChange(true, false);
 
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
     })
 
     // bug fixed
-    it('should update when selection then constraint changes', () => {
+    it('should update when pickion then constraint changes', () => {
       setSpiesReturnAndUpdate(false, false, false);
 
-      emitSelectionChange(true, false);
+      emitpickionChange(true, false);
       emitConstraintChange(true);
 
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
     })
   })
 
@@ -156,18 +156,18 @@ describe('SelectClass -', () => {
       expectClassToBe(DayState.INVALID);
 
       setSpiesReturnAndUpdate(true, true, false);
-      expectClassToBe(DayState.SELECTED);
+      expectClassToBe(DayState.PICKED);
 
       setSpiesReturnAndUpdate(true, false, true);
-      expectClassToBe(DayState.IN_SELECTION);
+      expectClassToBe(DayState.IN_PICK);
     })
 
     it('should use custom class name for all states', () => {
       setupInstances({
         valid: '__ok',
         invalid: '__notOk',
-        selected: '__isActivated',
-        inSelection: '__isPartiallyActivated',
+        picked: '__isActivated',
+        inPick: '__isPartiallyActivated',
       });
 
       setSpiesReturnAndUpdate(true, false, false);
@@ -192,8 +192,8 @@ class MockConstraint extends DateConstraint {
   }
 }
 
-class MockSelect extends DatepickerSelect<Date, void> {
-  selectionChange = new EventEmitter<Date>();
+class MockPicker extends DatePicker<Date, void> {
+  pickionChange = new EventEmitter<Date>();
 
   protected isValid: (date: Date) => boolean;
   protected onTouchedCallback: () => void;
@@ -209,16 +209,16 @@ class MockSelect extends DatepickerSelect<Date, void> {
   public setValue(value: Date, options?: EmitOptions): void {
     throw new Error('Should not be called');
   }
-  public select(date: Date) {
+  public pick(date: Date) {
     throw new Error('Should not be called');
   }
-  public unselect(date: Date) {
+  public unpick(date: Date) {
     throw new Error('Should not be called');
   }
-  public isSelected(date: Date): boolean {
+  public isPicked(date: Date): boolean {
     throw new Error('Should not be called');
   }
-  public isInSelection(date: Date): boolean {
+  public isInPick(date: Date): boolean {
     throw new Error('Should not be called');
   }
   protected updateValidity(): void { }
@@ -257,7 +257,7 @@ class MockRenderer implements Renderer2 {
   removeChild(parent: any, oldChild: any): void {
     throw new Error('Should not be called');
   }
-  selectRootElement(selectorOrNode: any) {
+  selectRootElement(pickorOrNode: any) {
     throw new Error('Should not be called');
   }
   parentNode(node: any) {

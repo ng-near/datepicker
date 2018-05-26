@@ -2,50 +2,50 @@ import { Directive, ElementRef, Inject, InjectionToken, Input, OnChanges, OnDest
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { DatepickerSelect } from '../selection/base.select';
+import { DatePicker } from '../pickers/base';
 import { DayDate } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
 
 export const enum DayState {
   INVALID = 'invalid',
   VALID = 'valid',
-  IN_SELECTION = 'inSelection',
-  SELECTED = 'selected',
+  IN_PICK = 'inPick',
+  PICKED = 'picked',
 };
 
 export interface StateClassesName {
   invalid?: string;
   valid?: string;
-  inSelection?: string;
-  selected?: string;
+  inPick?: string;
+  picked?: string;
 }
 
 export const STATE_CLASSES = new InjectionToken<StateClassesName>('');
 
 @Directive({
-  selector: '[selectClass]'
+  selector: '[stateClass]'
 })
-export class SelectClass implements OnChanges, OnDestroy {
+export class StateClass implements OnChanges, OnDestroy {
 
-  @Input('selectClass')
+  @Input('stateClass')
   day: DayDate;
 
   private getClass: (s: DayState) => string = s => s;
   private getValidityState: () => DayState.VALID | DayState.INVALID = () => DayState.VALID;
 
-  private selectState: DayState;
+  private state: DayState;
 
   private subs = new Subscription();
 
   constructor (
-    private select: DatepickerSelect<any>,
+    private picker: DatePicker<any>,
     @Optional() @Inject(STATE_CLASSES) stateClasses: StateClassesName | null,
     @Optional() dateConstraint: DateConstraint,
     private elRef: ElementRef,
     private renderer: Renderer) {
 
     this.subs.add(
-      select.selectionChange.subscribe(() => { this.updateSelection() })
+      picker.pickChange.subscribe(() => { this.updateSelection() })
     );
 
     if (stateClasses !== null) {
@@ -65,13 +65,13 @@ export class SelectClass implements OnChanges, OnDestroy {
   }
 
   private getSelectionState() {
-    return this.select.isSelected(this.day) ? DayState.SELECTED :
-      this.select.isInSelection(this.day) ? DayState.IN_SELECTION :
+    return this.picker.isPicked(this.day) ? DayState.PICKED :
+      this.picker.isInPick(this.day) ? DayState.IN_PICK :
       DayState.VALID;
   }
 
   private updateSelection() {
-    if (this.selectState !== DayState.INVALID) {
+    if (this.state !== DayState.INVALID) {
       this.updateStateClass(this.getSelectionState());
     }
   }
@@ -85,7 +85,7 @@ export class SelectClass implements OnChanges, OnDestroy {
     /* when new state is valid we only update if it was previously invalid
      *   if state was valid, selected or in selection we keep it that way.
      */
-    } else if (this.selectState === DayState.INVALID) {
+    } else if (this.state === DayState.INVALID) {
       this.updateStateClass(this.getSelectionState());
     }
   }
@@ -101,11 +101,11 @@ export class SelectClass implements OnChanges, OnDestroy {
 
 
   private updateStateClass(state: DayState) {
-    if (state !== this.selectState) {
+    if (state !== this.state) {
       this.renderer.addClass(this.elRef.nativeElement, this.getClass(state));
-      this.renderer.removeClass(this.elRef.nativeElement, this.getClass(this.selectState));
+      this.renderer.removeClass(this.elRef.nativeElement, this.getClass(this.state));
 
-      this.selectState = state;
+      this.state = state;
     }
   }
 

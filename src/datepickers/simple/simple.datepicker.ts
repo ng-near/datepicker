@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, NgModule } from '@angular/core';
 
-import { DateMonths } from '../../index';
 import { DatepickerModule } from '../../module';
+import { DatePicker } from '../../pickers/base';
+import { DateMonths } from '../../utils/date.months';
 import { ensureMonthDate } from '../../utils/utils';
 
 @Component({
@@ -19,7 +20,7 @@ import { ensureMonthDate } from '../../utils/utils';
       </div>
       <div class="days">
         <span *simpleFor="let d of month | days: true"
-              (mousedown)="selector.selectDate(d)"
+              (mousedown)="picker.pick(d)"
               [selectClass]="d"
               [class.isToday]="d | isToday"
               [class.currMonth]="d | isMonth: month">
@@ -60,6 +61,8 @@ import { ensureMonthDate } from '../../utils/utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SimpleDatepicker {
+
+  constructor(public picker: DatePicker<any>) { }
 
   @Input() months = new DateMonths(ensureMonthDate());
 

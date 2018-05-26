@@ -6,7 +6,7 @@ While this lib is named **ng-near/datepicker** and we provide some datepicker co
 Here is the code for a simple datepicker :
 
 ```html
-<div singleSelect #selector="selector">
+<div singlePicker #picker="picker">
   <div class="header">
     <button (click)="calendar = calendar.shiftMonth(-1)">prev</button>
     <span>{{ calendar.month | date: 'MMMM y' }}</span>
@@ -15,7 +15,7 @@ Here is the code for a simple datepicker :
   <span *staticFor="let wd for 'short' | dayNames">{{ wd }}</span>
   <div class="days">
     <span *staticFor="let d of calendar.month | days"
-          (click)="selector.selectDate(d)"
+          (click)="picker.pick(d)"
           [selectClass]="d"
           [class.isToday]="d | isToday"
           [class.currMonth]="d | isMonth: month">

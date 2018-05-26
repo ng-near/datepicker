@@ -2,18 +2,18 @@ import { Directive, Input, OnChanges, Optional, SimpleChanges } from '@angular/c
 
 import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
-import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
+import { DatePicker, EmitOptions, pickerProviders } from './base';
 
 @Directive({
-  selector: '[multiSelect]',
-  exportAs: 'selector, multiSelect',
-  providers: selectProviders(MultiSelect)
+  selector: '[multiPicker]',
+  exportAs: 'picker, multiPicker',
+  providers: pickerProviders(MultiPicker)
 })
-export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChanges {
+export class MultiPicker extends DatePicker<DayDate[]> implements OnChanges {
 
   private _limit = Infinity;
 
-  @Input('multiSelect')
+  @Input('multiPicker')
   get limit() {
     return this._limit;
   }
@@ -72,7 +72,7 @@ export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChange
     return this.filterValue(d => !isSameDay(d, date));
   }
 
-  public isSelected(date: DayDate) {
+  public isPicked(date: DayDate) {
     return this.value.some(d => isSameDay(d, date));
   }
 

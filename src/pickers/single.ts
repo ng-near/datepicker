@@ -2,7 +2,7 @@ import { Directive, Optional } from '@angular/core';
 
 import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
-import { DatepickerSelect, selectProviders } from './base.select';
+import { DatePicker, pickerProviders } from './base';
 
 /**
  * TODO docs
@@ -10,11 +10,11 @@ import { DatepickerSelect, selectProviders } from './base.select';
  */
 
 @Directive({
-  selector: '[singleSelect]',
-  exportAs: 'selector, singleSelect',
-  providers: selectProviders(SingleSelect),
+  selector: '[singlePicker]',
+  exportAs: 'picker, singlePicker',
+  providers: pickerProviders(SinglePicker),
 })
-export class SingleSelect extends DatepickerSelect<DayDate | null | undefined> {
+export class SinglePicker extends DatePicker<DayDate | null | undefined> {
 
   constructor(@Optional() dateConstraint: DateConstraint) {
     super(undefined, dateConstraint);
@@ -34,7 +34,7 @@ export class SingleSelect extends DatepickerSelect<DayDate | null | undefined> {
     return false;
   }
 
-  isSelected(date: DayDate): boolean {
+  isPicked(date: DayDate): boolean {
     return isSameDay(date, this.value);
   }
 

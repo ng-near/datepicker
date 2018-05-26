@@ -1,4 +1,4 @@
-import { EventEmitter, forwardRef, OnDestroy, Output, Provider } from '@angular/core';
+import { EventEmitter, OnDestroy, Output, Provider } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Subscription } from 'rxjs/Subscription';
@@ -12,14 +12,14 @@ export interface EmitOptions {
     emitViewToModelChange?: boolean;
 }
 
-export abstract class DatepickerSelect<T, R = void> implements ControlValueAccessor, OnDestroy {
+export abstract class DatePicker<T, R = void> implements ControlValueAccessor, OnDestroy {
 
   get value(): T {
     return this._value;
   }
 
   @Output()
-  selectionChange = new EventEmitter<T>();
+  pickChange = new EventEmitter<T>();
 
   protected isValid: (date: DayDate) => boolean = d => true;
   private sub: Subscription | undefined;
@@ -58,30 +58,30 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
       }
 
       if (options.emitEvent !== false) {
-        this.selectionChange.emit(value);
+        this.pickChange.emit(value);
       }
     }
   }
 
-  public select(date: DayDate, extra?: R): void;
+  public pick(date: DayDate, extra?: R): void;
   /* we shouldn't select a null/undefined date so we don't expose it on signature
    * but let's still handle it.
    */
-  public select(date: DayDate | null | undefined, extra?: R) {
+  public pick(date: DayDate | null | undefined, extra?: R) {
     if (date && this.isValid(date) &&
       (this.remove(date, extra) || this.add(date, extra))) {
       this.onTouchedCallback();
     }
   }
 
-  public unselect(date: DayDate, extra?: R): void;
-  public unselect(date: DayDate | null | undefined, extra?: R) {
+  public unpick(date: DayDate, extra?: R): void;
+  public unpick(date: DayDate | null | undefined, extra?: R) {
     if (date && this.remove(date, extra)) {
       this.onTouchedCallback();
     }
   }
 
-  public isInSelection(date: DayDate): boolean {
+  public isInPick(date: DayDate): boolean {
     return false;
   }
 
@@ -104,7 +104,7 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
    */
   protected abstract remove(date: DayDate, extra?: R): boolean;
 
-  public abstract isSelected(date: DayDate): boolean;
+  public abstract isPicked(date: DayDate): boolean;
 
   /**
    * @returns true if the selection is full.
@@ -118,10 +118,10 @@ export abstract class DatepickerSelect<T, R = void> implements ControlValueAcces
   }
 }
 
-export function selectProviders(directiveClass: Function): Provider[] {
+export function pickerProviders(directiveClass: Function): Provider[] {
   return [
     DateConstraintProvider,
-    { provide: DatepickerSelect, useExisting: forwardRef(() => directiveClass) },
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => directiveClass), multi: true }
+    { provide: DatePicker, useExisting: directiveClass },
+    { provide: NG_VALUE_ACCESSOR, useExisting: directiveClass, multi: true }
   ];
 }

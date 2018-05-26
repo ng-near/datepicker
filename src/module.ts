@@ -3,20 +3,20 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 
 import { DayNames, Days, IsMonth, IsToday, MonthNames, Years } from './display/calendar.pipes';
 import { ISODays, ISOWeeks } from './display/iso.pipes';
-import { SelectClass } from './display/selectclass';
-import { convertDate } from './index';
-import { MultiSelect } from './selection/multi.select';
-import { RangeSelect } from './selection/range.select';
-import { SingleSelect } from './selection/single.select';
+import { StateClass } from './display/stateclass';
+import { MultiPicker } from './pickers/multi';
+import { RangePicker } from './pickers/range';
+import { SinglePicker } from './pickers/single';
 import { StaticForOf } from './utils/staticfor';
 import { Today } from './utils/today';
+import { convertDate } from './utils/utils';
 import { VALIDATOR_DIRECTIVES } from './validator/directives';
 import { DATE_CONVERTER } from './validator/model';
 
 const decl_exports = [
-  SingleSelect,
-  MultiSelect,
-  RangeSelect,
+  SinglePicker,
+  MultiPicker,
+  RangePicker,
 
   ...VALIDATOR_DIRECTIVES,
 
@@ -25,7 +25,7 @@ const decl_exports = [
   DayNames, MonthNames, Years, Days, IsMonth, IsToday,
   ISOWeeks, ISODays,
 
-  SelectClass,
+  StateClass,
 ];
 
 export interface DatepickerConfig {

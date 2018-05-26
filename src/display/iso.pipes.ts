@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { getIsoWeek, MonthDate } from '../index';
+import { getIsoWeek, MonthDate } from '../utils/utils';
 
 export interface ISOWeekOfYear {
     year: number;

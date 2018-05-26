@@ -1,5 +1,4 @@
-import { convertDate, ensureDayDate, ensureMonthDate, isSameDay, isSameMonth } from '../../../src/index';
-import { getIsoWeek } from '../../../src/utils/utils';
+import { convertDate, ensureDayDate, ensureMonthDate, getIsoWeek, isSameDay, isSameMonth } from '../../../src/utils/utils';
 
 function expectMidnight(date: Date) {
     expect(date.getHours()).toBe(0);
