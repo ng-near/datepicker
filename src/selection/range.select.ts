@@ -25,6 +25,7 @@ export type DetectStrategyFn = (value: RangeDate, selectedDate: DayDate) => Rang
 
 @Directive({
   selector: '[rangeSelect]',
+  exportAs: 'selector, rangeSelect',
   providers: selectProviders(RangeSelect)
 })
 export class RangeSelect extends DatepickerSelect<RangeDate, RangeSelectType> implements OnChanges {

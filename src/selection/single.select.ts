@@ -11,9 +11,10 @@ import { DatepickerSelect } from './base.select';
 
 @Directive({
   selector: '[singleSelect]',
+  exportAs: 'selector, singleSelect',
   providers: [
     { provide: DatepickerSelect, useExisting: forwardRef(() => SingleSelect) }
-  ]
+  ],
 })
 export class SingleSelect extends DatepickerSelect<DayDate | null | undefined> {
 

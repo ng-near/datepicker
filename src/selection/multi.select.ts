@@ -6,6 +6,7 @@ import { DatepickerSelect, EmitOptions, selectProviders } from './base.select';
 
 @Directive({
   selector: '[multiSelect]',
+  exportAs: 'selector, multiSelect',
   providers: selectProviders(MultiSelect)
 })
 export class MultiSelect extends DatepickerSelect<DayDate[]> implements OnChanges {
