@@ -1,20 +1,19 @@
 {
-  "name": "ng-imbadatepicker",
-  "version": "0.0.5",
+  "name": "@ng-near/datepicker",
+  "version": "0.5.0",
   "description": "Angular Datepicker toolset",
   "typings": "dist/index.d.ts",
   "module": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/imbasoft/ng-imbaDatepicker.git"
+    "url": "git+https://github.com/ng-near/datepicker.git"
   },
   "scripts": {
-    "compile": "gulp compile",
-    "build": "gulp build",
-    "test": "karma start"
+    "build": "../libmaker/index.js build",
+    "test": "../libmaker/index.js test"
   },
   "keywords": [
-    "angular2",
+    "angular",
     "datepicker",
     "date",
     "component"
