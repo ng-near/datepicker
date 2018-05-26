@@ -1,8 +1,8 @@
-import { Directive, forwardRef, Optional } from '@angular/core';
+import { Directive, Optional } from '@angular/core';
 
 import { DayDate, isSameDay } from '../utils/utils';
 import { DateConstraint } from '../validator/directives';
-import { DatepickerSelect } from './base.select';
+import { DatepickerSelect, selectProviders } from './base.select';
 
 /**
  * TODO docs
@@ -12,9 +12,7 @@ import { DatepickerSelect } from './base.select';
 @Directive({
   selector: '[singleSelect]',
   exportAs: 'selector, singleSelect',
-  providers: [
-    { provide: DatepickerSelect, useExisting: forwardRef(() => SingleSelect) }
-  ],
+  providers: selectProviders(SingleSelect),
 })
 export class SingleSelect extends DatepickerSelect<DayDate | null | undefined> {
 
